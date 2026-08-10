@@ -61,6 +61,18 @@ conviene usar, ni que una sola compra puede impactar tres programas a la vez.
     **Caza el logo Primax**, el reto de realidad aumentada (necesita celular, HTTPS y el marcador
     impreso, ver abajo).
 
+### Pasarle la demo a otra persona
+
+Agregale **`?reset=1`** a la URL:
+
+```text
+https://axellab.github.io/cx-demo-app/?reset=1
+```
+
+Quien abra ese link empieza siempre desde el onboarding, sin arrastrar el recorrido del anterior.
+El parámetro se saca de la URL apenas carga, así que si esa persona recarga a mitad de camino no
+pierde lo que venía haciendo. En **Perfil → Copiar link para otra persona** lo tenés a mano.
+
 Controles de demo, en **Perfil**:
 
 - **Ver la unificación otra vez** — repite solo el onboarding.

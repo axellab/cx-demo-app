@@ -140,6 +140,29 @@ export function Profile() {
             </div>
             <Icon name="right" size={18} />
           </button>
+          <button
+            className="prow s-prof-link"
+            onClick={async () => {
+              // El link con ?reset=1 arranca siempre desde el onboarding:
+              // sirve para pasarle el teléfono a la próxima persona.
+              const link = `${location.origin}${location.pathname}?reset=1`;
+              try {
+                await navigator.clipboard.writeText(link);
+                toast('Link copiado: quien lo abra empieza desde cero');
+              } catch {
+                toast(link);
+              }
+            }}
+          >
+            <span className="pbadge" style={{ width: 38, height: 38, background: 'var(--p-convenio)' }}>
+              <Icon name="link" size={19} strokeWidth={2} />
+            </span>
+            <div className="grow">
+              <h4>Copiar link para otra persona</h4>
+              <p>Abre la demo desde el onboarding, sin arrastrar tu recorrido</p>
+            </div>
+            <Icon name="right" size={18} />
+          </button>
         </div>
 
         <p className="tiny muted s-prof-foot">

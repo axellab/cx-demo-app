@@ -66,6 +66,26 @@ const INITIAL: State = {
 
 const KEY = 'primax-id-demo/v1';
 
+/**
+ * `?reset=1` en la URL arranca la demo desde cero.
+ *
+ * Es para pasarle el teléfono a la próxima persona sin entrar a Perfil: se
+ * comparte ese link y cada vez que se abre, la app empieza en el onboarding.
+ * Después el parámetro se saca de la URL, así que si esa persona recarga en
+ * medio del recorrido no pierde lo que venía haciendo.
+ */
+function consumeResetParam(): void {
+  try {
+    const url = new URL(location.href);
+    if (url.searchParams.get('reset') !== '1') return;
+    localStorage.removeItem(KEY);
+    url.searchParams.delete('reset');
+    history.replaceState(null, '', url.toString());
+  } catch {
+    /* sin URL válida o sin storage: la demo sigue igual */
+  }
+}
+
 function load(): State {
   try {
     const raw = localStorage.getItem(KEY);
@@ -78,6 +98,7 @@ function load(): State {
   }
 }
 
+consumeResetParam();
 let state: State = load();
 const listeners = new Set<() => void>();
 
