@@ -6,3 +6,6 @@ dist
 
 # Temporales de Office
 ~$*
+
+# Preferencias locales de Claude Code
+.claude/settings.local.json
