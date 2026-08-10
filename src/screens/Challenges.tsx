@@ -1,14 +1,16 @@
 import { Icon } from '../components/Icon';
 import { CHALLENGES } from '../data/catalog';
 import { useNav } from '../lib/nav';
-import { useStore } from '../lib/store';
+import { today, useStore } from '../lib/store';
 
 export function Challenges() {
   const { go, toast } = useNav();
-  const { arClaimed } = useStore();
+  const { arClaimed, gamePlayedOn } = useStore();
 
   const ar = CHALLENGES.find((c) => c.kind === 'ar')!;
-  const rest = CHALLENGES.filter((c) => c.kind !== 'ar');
+  const game = CHALLENGES.find((c) => c.kind === 'game')!;
+  const rest = CHALLENGES.filter((c) => c.kind === 'progress');
+  const wonToday = gamePlayedOn === today();
 
   return (
     <section className="screen s-chal">
@@ -30,6 +32,26 @@ export function Challenges() {
           <p>{ar.detail}</p>
           <span className="s-chal-ar-cta">
             {arClaimed ? 'Volver a jugar' : 'Activar cámara'} · {ar.reward}
+          </span>
+        </button>
+
+        {/* Juego diario — pensado para que jueguen los chicos en la estación */}
+        <div className="section-head">
+          <h3>Para jugar en familia</h3>
+        </div>
+        <button className="s-chal-game" onClick={() => go('game')}>
+          <span className="s-chal-game-icons">
+            <Icon name="fuel" size={18} strokeWidth={2} />
+            <Icon name="coffee" size={18} strokeWidth={2} />
+            <Icon name="flame" size={18} strokeWidth={2} />
+            <Icon name="sparkles" size={18} strokeWidth={2} />
+          </span>
+          <span className="grow">
+            <h4>{game.title}</h4>
+            <p>{game.detail}</p>
+          </span>
+          <span className={`s-chal-game-tag${wonToday ? ' done' : ''}`}>
+            {wonToday ? 'Ya jugaste hoy' : game.reward}
           </span>
         </button>
 

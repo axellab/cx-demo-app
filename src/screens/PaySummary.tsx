@@ -27,7 +27,12 @@ export function PaySummary({ context, onPaid }: Props) {
   const { back } = useNav();
   const purchase = DEMO_PURCHASES[context];
 
-  const wallet: WalletState = { points: store.points, stamps: store.stamps, hasConvenio: true };
+  const wallet: WalletState = {
+    points: store.points,
+    stamps: store.stamps,
+    hasConvenio: true,
+    credit: store.credit,
+  };
   const [sel, setSel] = useState<Selection>(() => bestSelection(purchase, wallet));
   const [authorizing, setAuthorizing] = useState(false);
   const timer = useRef<number>();
@@ -112,6 +117,7 @@ export function PaySummary({ context, onPaid }: Props) {
                       on={row.enabled}
                       onChange={(v) => {
                         if (row.id === 'cupon') setSel({ ...sel, cupon: v });
+                        if (row.id === 'credito') setSel({ ...sel, credito: v });
                         if (row.id === 'bonuspaga') {
                           setSel({ ...sel, bonusPts: v ? b.maxBonusPts : 0 });
                         }

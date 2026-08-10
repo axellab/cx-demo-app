@@ -14,8 +14,16 @@ import { actions } from '../lib/store';
    o la cámara se rechaza, el resto de la app sigue funcionando igual.
    ============================================================ */
 
+/**
+ * Solo estos dos, y en este orden.
+ *
+ * El prototipo original cargaba además `mindar-image.prod.js`, pero ese archivo
+ * es un ES module de 266 bytes: en un <script> clásico tira error de sintaxis,
+ * nunca define `window.MINDAR` y no aporta nada. `mindar-image-aframe.prod.js`
+ * es un bundle autocontenido que ya trae el Controller y el Compiler, y registra
+ * los componentes de A-Frame — por eso A-Frame tiene que estar cargado antes.
+ */
 const SCRIPTS = [
-  'https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image.prod.js',
   'https://aframe.io/releases/1.4.2/aframe.min.js',
   'https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js',
 ];
@@ -53,6 +61,9 @@ export function ARChallenge() {
   const [phase, setPhase] = useState<Phase>('permission');
   const [error, setError] = useState('');
   const [log, setLog] = useState<string[]>([]);
+  // Espejo de `phase` para poder consultarlo desde timers sin recrearlos.
+  const phaseRef = useRef<Phase>('permission');
+  phaseRef.current = phase;
 
   const hostRef = useRef<HTMLDivElement>(null);
   const systemRef = useRef<{ start: () => Promise<void>; stop: () => void } | null>(null);
@@ -89,13 +100,11 @@ export function ARChallenge() {
     // Si el permiso de cámara queda colgado (pasa cuando el navegador lo tiene
     // bloqueado), no dejamos la pantalla en "preparando…" para siempre.
     watchdog.current = window.setTimeout(() => {
-      setPhase((p) => {
-        if (p !== 'starting') return p;
-        setError(
-          'La cámara no respondió. Revisá que el navegador tenga permiso y que estés entrando por HTTPS.',
-        );
-        return 'error';
-      });
+      if (phaseRef.current !== 'starting') return;
+      setError(
+        'La cámara no respondió a tiempo. Revisá que el navegador tenga permiso de cámara y que estés entrando por HTTPS (o localhost).',
+      );
+      setPhase('error');
     }, 12000);
 
     try {
@@ -188,6 +197,14 @@ export function ARChallenge() {
     back();
   }
 
+  /** Vuelve a intentar sin salir de la pantalla (las librerías ya están en caché). */
+  function retry() {
+    teardown();
+    setError('');
+    setLog([]);
+    setPhase('permission');
+  }
+
   const live = phase === 'starting' || phase === 'scanning' || phase === 'found';
 
   return (
@@ -205,14 +222,15 @@ export function ARChallenge() {
           </span>
           <h2>Descubrí tu sorpresa</h2>
           <p>
-            Apuntá la cámara al logo de Primax — en la estación, en tu tienda LiSTO! o en el surtidor
-            — y desbloqueá un bono de puntos.
+            Apuntá la cámara al marcador de Primax — en la estación, en tu tienda LiSTO! o en el
+            surtidor — y desbloqueá un bono de puntos.
           </p>
           <button className="btn btn-primary btn-block" onClick={start}>
             Activar cámara
           </button>
           <p className="tiny muted">
-            Necesita permiso de cámara y una conexión segura (HTTPS). Podés salir cuando quieras.
+            Necesita permiso de cámara y HTTPS (o localhost). Para probarlo, generá e imprimí el
+            marcador desde <code>/herramientas/marcador.html</code>.
           </p>
         </div>
       )}
@@ -252,13 +270,23 @@ export function ARChallenge() {
           </span>
           <h2>No pudimos abrir la cámara</h2>
           <p>{error}</p>
-          <button className="btn btn-primary btn-block" onClick={exit}>
+          {/* El log va a la vista sí o sí: si falla en una demo, esto es lo que
+              hace falta para saber por qué, sin tener que recargar con ?debug=1. */}
+          <div className="s-ar-errlog">
+            {log.map((l, i) => (
+              <div key={i}>{l}</div>
+            ))}
+          </div>
+          <button className="btn btn-primary btn-block" onClick={retry}>
+            Reintentar
+          </button>
+          <button className="btn btn-ghost btn-block" onClick={exit}>
             Volver a los retos
           </button>
         </div>
       )}
 
-      {debug && log.length > 0 && (
+      {debug && phase !== 'error' && log.length > 0 && (
         <div className="s-ar-debug">
           {log.map((l, i) => (
             <div key={i}>{l}</div>

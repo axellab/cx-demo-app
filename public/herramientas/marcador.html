@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Marcador AR · Primax ID</title>
+    <style>
+      :root {
+        --blue: #1e2fa0;
+        --blue-800: #101b6b;
+        --orange: #f4610c;
+        --ink: #131a3a;
+        --muted: #7b86a8;
+        --line: #e8edf6;
+      }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body {
+        font-family: -apple-system, 'Segoe UI', Roboto, system-ui, sans-serif;
+        background: #f4f6fb; color: var(--ink); line-height: 1.5;
+        padding: 2rem 1.2rem 4rem;
+      }
+      main { max-width: 760px; margin: 0 auto; }
+      h1 { font-size: 1.5rem; letter-spacing: -0.02em; }
+      h2 { font-size: 1rem; margin: 2rem 0 .6rem; }
+      p { color: var(--muted); font-size: .9rem; }
+      .card {
+        background: #fff; border: 1px solid var(--line); border-radius: 16px;
+        padding: 1.2rem; margin-top: 1rem;
+      }
+      canvas { width: 100%; max-width: 380px; height: auto; border-radius: 10px; display: block; }
+      button {
+        font: inherit; font-weight: 700; border: none; border-radius: 999px;
+        padding: .8rem 1.5rem; cursor: pointer; margin: .4rem .4rem 0 0;
+        background: var(--blue); color: #fff;
+      }
+      button.alt { background: var(--orange); }
+      button:disabled { opacity: .45; cursor: default; }
+      #estado {
+        margin-top: 1rem; font-family: ui-monospace, Consolas, monospace; font-size: .78rem;
+        background: var(--blue-800); color: #7dfaa5; border-radius: 10px; padding: .8rem 1rem;
+        white-space: pre-wrap; min-height: 3rem;
+      }
+      ol { margin: .6rem 0 0 1.2rem; font-size: .9rem; color: var(--muted); }
+      ol li { margin-bottom: .35rem; }
+      code { background: #eef1f8; padding: .1rem .35rem; border-radius: 5px; font-size: .85em; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Marcador AR de Primax ID</h1>
+      <p>
+        Genera la imagen que reconoce el reto <em>“Caza el logo Primax”</em> y compila el
+        <code>targets.mind</code> que usa la app.
+      </p>
+
+      <div class="card">
+        <p style="color: var(--ink); font-weight: 600; margin-bottom: .8rem">
+          Por qué existe esta página
+        </p>
+        <p>
+          El <code>targets.mind</code> original se compiló a partir del logo de Primax: una imagen
+          plana, de pocos colores, que produce apenas <strong>25 puntos de seguimiento</strong>. Con
+          tan pocos, MindAR casi nunca llega a reconocerla. Un marcador utilizable necesita cientos
+          de puntos, y para eso hace falta <strong>textura</strong>: bordes, formas y contraste
+          repartidos por toda la imagen. Eso es lo que dibuja el generador de abajo, manteniendo la
+          identidad de marca.
+        </p>
+      </div>
+
+      <h2>1 · El marcador</h2>
+      <div class="card">
+        <canvas id="lienzo" width="600" height="600"></canvas>
+        <button id="btn-png">Descargar marcador-primax.png</button>
+        <p style="margin-top: .8rem">
+          Imprimilo en una hoja A5 o más grande, o mostralo en la pantalla de otro dispositivo.
+        </p>
+      </div>
+
+      <h2>2 · Compilar el targets.mind</h2>
+      <div class="card">
+        <button id="btn-compilar" class="alt">Compilar</button>
+        <button id="btn-mind" disabled>Descargar targets.mind</button>
+        <div id="estado">Listo para compilar.</div>
+        <ol>
+          <li>Tocá <strong>Compilar</strong> y esperá (tarda entre 20 y 60 segundos).</li>
+          <li>Fijate que el resultado tenga bastantes más de 25 puntos.</li>
+          <li>Descargá el archivo y reemplazá <code>public/targets.mind</code> del proyecto.</li>
+          <li>
+            Guardá también el PNG como <code>public/herramientas/marcador-primax.png</code> para que
+            quede versionado junto al <code>.mind</code> que le corresponde.
+          </li>
+        </ol>
+      </div>
+    </main>
+
+    <script type="module">
+      // El build ESM es el correcto para importar el Compiler. Ojo: este mismo archivo
+      // cargado con un <script> clásico no funciona — es el error que tenía el prototipo.
+      import { Compiler } from 'https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image.prod.js';
+
+      const estado = document.getElementById('estado');
+      const log = (m) => { estado.textContent = m; };
+
+      /* ── Dibujo determinístico del marcador ────────────────────────────
+         Mucho detalle de alta frecuencia = muchos puntos de interés. La semilla
+         fija hace que el marcador sea siempre el mismo, así el .mind compilado
+         y la imagen impresa nunca se desincronizan. */
+      const lienzo = document.getElementById('lienzo');
+      const S = lienzo.width;
+      const x = lienzo.getContext('2d');
+      let semilla = 20260810;
+      const rnd = () => { semilla = (semilla * 1103515245 + 12345) & 0x7fffffff; return semilla / 0x7fffffff; };
+
+      x.fillStyle = '#fff';
+      x.fillRect(0, 0, S, S);
+      const colores = ['#1e2fa0', '#f4610c', '#fba919', '#101b6b', '#17a34a'];
+      for (let i = 0; i < 200; i++) {
+        const px = rnd() * S, py = rnd() * S, r = 6 + rnd() * 26;
+        x.globalAlpha = 0.55 + rnd() * 0.45;
+        x.fillStyle = colores[Math.floor(rnd() * colores.length)];
+        x.beginPath();
+        if (rnd() > 0.5) x.arc(px, py, r, 0, Math.PI * 2);
+        else x.rect(px - r, py - r, r * 2, r * 2);
+        x.fill();
+        if (rnd() > 0.6) { x.strokeStyle = '#101b6b'; x.lineWidth = 1 + rnd() * 3; x.stroke(); }
+      }
+      x.globalAlpha = 1;
+      x.strokeStyle = '#101b6b';
+      x.lineWidth = 14;
+      x.strokeRect(7, 7, S - 14, S - 14);
+      x.fillStyle = '#fff';
+      x.fillRect(58, 232, S - 116, 136);
+      x.strokeStyle = '#f4610c';
+      x.lineWidth = 6;
+      x.strokeRect(58, 232, S - 116, 136);
+      x.textAlign = 'center';
+      x.fillStyle = '#1e2fa0';
+      x.font = '800 78px Segoe UI, sans-serif';
+      x.fillText('PRIMAX', S / 2, 322);
+      x.fillStyle = '#f4610c';
+      x.font = '800 21px Segoe UI, sans-serif';
+      x.fillText('MARCADOR AR · ID PRIMAX', S / 2, 352);
+
+      const bajar = (blob, nombre) => {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url; a.download = nombre; a.click();
+        setTimeout(() => URL.revokeObjectURL(url), 2000);
+      };
+
+      document.getElementById('btn-png').onclick = () =>
+        lienzo.toBlob((b) => bajar(b, 'marcador-primax.png'), 'image/png');
+
+      let mind = null;
+      document.getElementById('btn-compilar').onclick = async (e) => {
+        e.target.disabled = true;
+        log('Preparando la imagen…');
+        const img = new Image();
+        await new Promise((r) => { img.onload = r; img.src = lienzo.toDataURL('image/png'); });
+
+        const compiler = new Compiler();
+        const t0 = Date.now();
+        log('Compilando… 0 %');
+        const datos = await compiler.compileImageTargets([img], (p) =>
+          log(`Compilando… ${Math.round(p)} %`),
+        );
+        mind = compiler.exportData();
+
+        const puntos = datos[0].trackingData[0].points.length;
+        log(
+          `Listo en ${Math.round((Date.now() - t0) / 1000)} s\n` +
+            `Puntos de seguimiento: ${puntos}  (el marcador viejo tenía 25)\n` +
+            `Niveles de detección: ${datos[0].matchingData.length}\n` +
+            `Tamaño del archivo: ${(mind.byteLength / 1024).toFixed(0)} kB`,
+        );
+        document.getElementById('btn-mind').disabled = false;
+        e.target.disabled = false;
+      };
+
+      document.getElementById('btn-mind').onclick = () =>
+        bajar(new Blob([mind], { type: 'application/octet-stream' }), 'targets.mind');
+    </script>
+  </body>
+</html>

@@ -11,9 +11,10 @@ import { useNav } from '../lib/nav';
 import { actions, useStore } from '../lib/store';
 
 export function Wallet() {
-  const { points, stamps } = useStore();
+  const { points, stamps, credit } = useStore();
   const { toast } = useNav();
   const [confirm, setConfirm] = useState<RedeemItem | null>(null);
+  const [confirmCredit, setConfirmCredit] = useState(false);
 
   const cuponListo = stamps >= RULES.sellosParaCupon;
 
@@ -55,12 +56,21 @@ export function Wallet() {
             <span className="tiny muted">por galón premium</span>
             <span className="s-wallet-eq">Activo</span>
           </div>
-          <div className="s-wallet-tile">
-            <ProgramBadge id="gas" size={32} />
-            <b>7 %</b>
-            <span className="tiny muted">dto. en Primax Gas</span>
-            <span className="s-wallet-eq">Por nivel {USER.tier}</span>
-          </div>
+          {credit > 0 ? (
+            <div className="s-wallet-tile">
+              <ProgramBadge id="bonus" size={32} />
+              <b>{soles(credit)}</b>
+              <span className="tiny muted">saldo a favor</span>
+              <span className="s-wallet-eq">Se aplica al pagar</span>
+            </div>
+          ) : (
+            <div className="s-wallet-tile">
+              <ProgramBadge id="gas" size={32} />
+              <b>7 %</b>
+              <span className="tiny muted">dto. en Primax Gas</span>
+              <span className="s-wallet-eq">Por nivel {USER.tier}</span>
+            </div>
+          )}
         </div>
 
         {/* Sellos */}
@@ -81,6 +91,28 @@ export function Wallet() {
           <h3>Canjeá tus puntos</h3>
           <span className="tiny muted">{pts(points)} pts</span>
         </div>
+
+        {/* Canje sin mínimo: siempre hay algo para hacer con los puntos, aunque
+            no alcancen para el premio más barato del catálogo. */}
+        <button
+          className="s-wallet-direct"
+          onClick={() => setConfirmCredit(true)}
+          disabled={points === 0}
+        >
+          <span className="s-wallet-direct-icon">
+            <Icon name="percent" size={22} strokeWidth={2} />
+          </span>
+          <span className="grow">
+            <h4>Descontá tus puntos de tu próxima compra</h4>
+            <p>
+              {points > 0
+                ? `Tus ${pts(points)} pts se convierten en ${soles(points * RULES.solesPorPunto)} de saldo a favor`
+                : 'Sumá puntos para volver a usar esta opción'}
+            </p>
+          </span>
+          <span className="s-wallet-direct-tag">Sin mínimo</span>
+        </button>
+
         <div className="card">
           {REDEEM_ITEMS.map((item) => {
             const locked = points < item.cost;
@@ -120,6 +152,30 @@ export function Wallet() {
           ))}
         </div>
       </div>
+
+      <Sheet
+        open={confirmCredit}
+        onClose={() => setConfirmCredit(false)}
+        title="Descontar de tu próxima compra"
+      >
+        <p className="tiny muted" style={{ marginBottom: '.9rem', lineHeight: 1.6 }}>
+          Convertís tus <b>{pts(points)} puntos</b> en{' '}
+          <b>{soles(points * RULES.solesPorPunto)}</b> de saldo a favor. El saldo se descuenta solo
+          la próxima vez que pagues con tu QR, en playa, tienda LiSTO! o Primax Gas.
+        </p>
+        <button
+          className="btn btn-primary btn-block"
+          onClick={() => {
+            const value = points * RULES.solesPorPunto;
+            actions.redeemPointsForCredit();
+            setConfirmCredit(false);
+            toast(`${soles(value)} de saldo a favor listo para tu próxima compra`);
+          }}
+        >
+          <Icon name="percent" size={18} strokeWidth={2.1} />
+          Convertir {pts(points)} pts
+        </button>
+      </Sheet>
 
       <Sheet open={!!confirm} onClose={() => setConfirm(null)} title="Confirmar canje">
         {confirm && (

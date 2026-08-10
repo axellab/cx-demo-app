@@ -81,13 +81,15 @@ img {
 /* ============================================================
    Pantallas
    ============================================================ */
+/* Sin `background` propio a propósito: el fondo lo pone `.app`, y cada pantalla
+   que necesita otro (splash, AR) lo define en screens.css sin pelear con esta
+   regla por especificidad. */
 .screen {
   position: absolute;
   inset: 0;
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  background: var(--bg);
   animation: screenIn 0.26s cubic-bezier(0.22, 0.8, 0.3, 1);
 }
 

@@ -15,11 +15,9 @@ import { Wallet } from './screens/Wallet';
 import { History } from './screens/History';
 import { Challenges } from './screens/Challenges';
 import { ARChallenge } from './screens/ARChallenge';
+import { MiniGame } from './screens/MiniGame';
 import { MapScreen } from './screens/MapScreen';
 import { Profile } from './screens/Profile';
-
-import './styles/components.css';
-import './styles/screens.css';
 
 export interface Receipt {
   purchase: Purchase;
@@ -84,6 +82,7 @@ export default function App() {
         {screen === 'history' && <History />}
         {screen === 'challenges' && <Challenges />}
         {screen === 'ar' && <ARChallenge />}
+        {screen === 'game' && <MiniGame />}
         {screen === 'map' && <MapScreen />}
         {screen === 'profile' && <Profile />}
 

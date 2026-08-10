@@ -9,12 +9,13 @@ import { USER } from '../data/user';
 import { RULES } from '../lib/benefits';
 import { soles } from '../lib/format';
 import { useNav } from '../lib/nav';
-import { useStore } from '../lib/store';
+import { today, useStore } from '../lib/store';
 
 export function Home() {
   const { go, toast } = useNav();
-  const { stamps } = useStore();
+  const { stamps, gamePlayedOn } = useStore();
 
+  const wonToday = gamePlayedOn === today();
   const cuponListo = stamps >= RULES.sellosParaCupon;
   const tierPct = Math.round(((2000 - USER.pointsToNextTier) / 2000) * 100);
   const precioConConvenio = NEARBY_STATION.premium - RULES.convenioPorGalon.premium;
@@ -116,6 +117,22 @@ export function Home() {
             <p>{CHALLENGES[0].detail}</p>
           </div>
           <span className="s-home-ar-reward">{CHALLENGES[0].reward}</span>
+        </button>
+
+        <button className="s-chal-game" onClick={() => go('game')} style={{ marginTop: '.7rem' }}>
+          <span className="s-chal-game-icons">
+            <Icon name="fuel" size={18} strokeWidth={2} />
+            <Icon name="coffee" size={18} strokeWidth={2} />
+            <Icon name="flame" size={18} strokeWidth={2} />
+            <Icon name="sparkles" size={18} strokeWidth={2} />
+          </span>
+          <span className="grow">
+            <h4>Memotest Primax</h4>
+            <p>Para los más chicos, mientras esperan en la estación</p>
+          </span>
+          <span className={`s-chal-game-tag${wonToday ? ' done' : ''}`}>
+            {wonToday ? 'Ya jugaste hoy' : '+5 pts'}
+          </span>
         </button>
 
         {/* Promos */}

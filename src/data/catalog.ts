@@ -75,8 +75,8 @@ export interface Challenge {
   reward: string;
   progress: number;
   goal: number;
-  /** El reto AR abre la cámara en lugar de mostrar progreso. */
-  kind: 'progress' | 'ar';
+  /** 'ar' abre la cámara y 'game' el memotest; ninguno muestra barra de progreso. */
+  kind: 'progress' | 'ar' | 'game';
 }
 
 export const CHALLENGES: Challenge[] = [
@@ -88,6 +88,15 @@ export const CHALLENGES: Challenge[] = [
     progress: 0,
     goal: 1,
     kind: 'ar',
+  },
+  {
+    id: 'memotest',
+    title: 'Memotest Primax',
+    detail: 'Para los más chicos, mientras esperan en la estación',
+    reward: '+5 pts por día',
+    progress: 0,
+    goal: 1,
+    kind: 'game',
   },
   {
     id: 'visitas',

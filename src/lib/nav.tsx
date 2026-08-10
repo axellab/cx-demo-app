@@ -11,6 +11,7 @@ export type ScreenId =
   | 'history'
   | 'challenges'
   | 'ar'
+  | 'game'
   | 'map'
   | 'profile';
 

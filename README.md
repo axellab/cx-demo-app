@@ -51,7 +51,12 @@ conviene usar, ni que una sola compra puede impactar tres programas a la vez.
    sellos, que se duplican solo si se paga con Bonus. No es una maqueta pintada.
 6. **Pago exitoso** — una transacción, tres programas actualizados al instante.
 7. **Actividad** — historial unificado; cada línea muestra qué programas se movieron.
-8. **Retos y misiones → Caza el logo Primax** — el módulo AR (necesita celular y HTTPS, ver abajo).
+8. **Beneficios → “Descontá tus puntos de tu próxima compra”** — canje sin mínimo: cualquier saldo,
+   por chico que sea, se convierte en saldo a favor y se aplica solo en el próximo pago. Resuelve al
+   cliente que nunca llega al premio más barato del catálogo.
+9. **Retos y misiones** — el **Memotest Primax** (juego para los chicos, +5 pts una vez por día) y
+   **Caza el logo Primax**, el reto de realidad aumentada (necesita celular, HTTPS y el marcador
+   impreso, ver abajo).
 
 Para repetir la demo: **Perfil → Reiniciar la demo** (vuelve a 1.240 pts, 5 sellos e historial
 original) o **Ver la unificación otra vez** (repite solo el onboarding).
@@ -73,9 +78,14 @@ Conviene tenerlo claro antes de presentar.
 
 **Supuestos de la demo** (no son datos oficiales — están en `src/lib/benefits.ts`):
 
-- 100 puntos = S/ 1.00 (heredado del prototipo original: 1.240 pts ≈ S/ 12.40).
+- **100 puntos = S/ 1.00** (heredado del prototipo original: 1.240 pts ≈ S/ 12.40). Es el número
+  del que dependen todos los demás: con esta relación, la compra de ejemplo ahorra un 17 %, que es
+  creíble. Subirla a 1 pt = S/ 0.05 haría que 1.240 pts valgan S/ 62 y el ahorro pasaría a más del
+  50 % de la boleta, que ya no se sostiene frente a un cliente. Si igual se quiere cambiar, es una
+  sola constante: `RULES.solesPorPunto` en `src/lib/benefits.ts`.
 - Combustible: 1 punto por galón.
 - El cupón de sellos vale S/ 5.50.
+- El Memotest da 5 puntos, una vez por día.
 - Precios de combustible, promos, retos, estaciones, perfil e historial son de ejemplo. La empresa
   del convenio ("Constructora Andina S.A.C.") es ficticia.
 
@@ -122,6 +132,10 @@ src/
 └── styles/              # tokens.css (marca) · global.css · components.css · screens.css
 ```
 
+> El orden de los `import` de CSS en `src/main.tsx` **es significativo**: define la cascada. Tienen
+> que ir antes de `import App`, porque si no las hojas que App arrastra se inyectan primero y las
+> reglas base terminan pisando a las de pantalla.
+
 **`src/lib/benefits.ts` es el corazón.** `computeBreakdown(compra, billetera, selección)` es una
 función pura que devuelve qué beneficios aplican, cuánto descuenta cada uno, el total y lo que el
 cliente acumula. La pantalla la vuelve a llamar con cada cambio de los controles, así que la
@@ -131,28 +145,59 @@ El estado se guarda en `localStorage` bajo `primax-id-demo/v1`.
 
 ---
 
-## Módulo AR
+## Módulo AR — por qué no detectaba, y cómo dejarlo andando
 
-Port del módulo del prototipo original: **MindAR 1.2.5 + A-Frame 1.4.2**, con el mismo
-`targets.mind` (compilado a partir del logo de Primax). Las librerías se cargan **bajo demanda** al
-entrar al reto — no pesan en la carga inicial de la app.
+Port del módulo del prototipo original: **MindAR 1.2.5 + A-Frame 1.4.2**. Las librerías se cargan
+**bajo demanda** al entrar al reto, así que no pesan en el arranque de la app.
 
-Requisitos: **HTTPS** (o `localhost`) y permiso de cámara. Chrome Android y Safari iOS son los
-targets. Si la cámara no arranca en 12 segundos, la pantalla muestra un error en lugar de quedar
-colgada.
+Al portarlo aparecieron **dos defectos reales**, los dos verificados en el navegador:
 
-Para diagnosticar, abrí la app con `?debug=1` y entrá al reto: aparece un panel con el log paso a
-paso.
+**1. Uno de los scripts nunca se cargaba.** El prototipo incluía
+`mind-ar@1.2.5/dist/mindar-image.prod.js` con un `<script>` clásico, pero ese archivo son 266 bytes
+de **ES module** (`import { C as o } from "./controller-…js"`). En un script clásico eso es un error
+de sintaxis: el navegador dispara igual el evento `load`, así que el fallo pasa desapercibido, y
+`window.MINDAR` nunca queda definido. El archivo que hace falta es
+`mindar-image-aframe.prod.js` — un bundle autocontenido de 1,7 MB que ya trae el Controller y el
+Compiler y registra los componentes de A-Frame. Hoy se cargan solo ese y A-Frame, en ese orden.
 
-**Para regenerar `targets.mind`** (si se quiere cambiar el marcador):
+**2. El marcador era casi imposible de reconocer.** El `targets.mind` heredado es válido y carga
+bien, pero al inspeccionarlo tiene **25 puntos de seguimiento** sobre una imagen de 611 × 343 —
+proporción y aspecto del wordmark de Primax. Un logo plano, de colores lisos y sin textura, casi no
+genera puntos de interés; un marcador utilizable tiene cientos. Con 25, MindAR necesita condiciones
+casi perfectas y en la práctica no engancha nunca. **Este es el motivo de fondo por el que “apuntar
+al logo” no funcionaba** — no era el código.
 
-1. Entrá a <https://hiukim.github.io/mind-ar-js-doc/tools/compile>.
-2. Arrastrá la imagen del marcador y tocá **Start**. Cuantos más puntos verdes repartidos por toda
-   la imagen, mejor va a trackear.
-3. **Download** y reemplazá `public/targets.mind`. Verificá la fecha del archivo — la vez pasada el
-   archivo nuevo quedó en Descargas y la app siguió usando el viejo.
+Agravante: la imagen original desde la que se compiló ese `.mind` (`logo.jpg`) **no está en el
+repositorio**, así que ni siquiera se podía saber a qué apuntar exactamente.
 
-Sin un `targets.mind` válido el resto de la app funciona igual; solo falla el reto AR.
+### Cómo generar un marcador que sí funcione
+
+Hay una herramienta incluida en el proyecto:
+
+```text
+http://localhost:5173/herramientas/marcador.html
+```
+
+Dibuja un marcador con identidad Primax pero con mucha textura (bordes, formas y contraste
+repartidos), lo compila con MindAR y te deja descargar las dos piezas. El flujo es:
+
+1. Abrí la página y descargá **`marcador-primax.png`**.
+2. Tocá **Compilar** y esperá. Fijate en el número de puntos que informa: tiene que ser bastante
+   mayor a 25.
+3. Descargá **`targets.mind`** y reemplazá `public/targets.mind`.
+4. Guardá el PNG en `public/herramientas/` para que quede versionado junto al `.mind` que le
+   corresponde — que fue justo lo que faltó la vez pasada.
+5. Imprimí el marcador en A5 o más grande, o mostralo en la pantalla de otro dispositivo.
+
+### Requisitos y diagnóstico
+
+**HTTPS** (o `localhost`) y permiso de cámara; Chrome Android y Safari iOS son los targets. Abrir la
+app desde el celular por IP local (`http://192.168.x.x:5173`) **no alcanza**: sin HTTPS el navegador
+bloquea la cámara.
+
+Si algo falla, la pantalla de error muestra el log paso a paso en vivo — no hace falta recargar con
+`?debug=1` — y tiene botón de reintentar. Si la cámara no responde en 12 segundos, corta sola en vez
+de quedarse colgada. Sin un `targets.mind` válido el resto de la app funciona igual.
 
 ---
 

@@ -2,7 +2,7 @@ import { useSyncExternalStore } from 'react';
 import type { HistoryEntry, ProgramId, Purchase } from '../types';
 import { SEED_HISTORY } from '../data/history';
 import { PROGRAMS } from '../data/programs';
-import type { Breakdown } from './benefits';
+import { RULES, type Breakdown } from './benefits';
 import { money } from './format';
 
 export interface State {
@@ -12,11 +12,21 @@ export interface State {
   linked: ProgramId[];
   points: number;
   stamps: number;
+  /** Saldo a favor en soles, de haber canjeado puntos por descuento directo. */
+  credit: number;
   /** Ahorro acumulado en el año — titular de la billetera. */
   savedYtd: number;
   history: HistoryEntry[];
   /** El reto AR ya fue reclamado en esta sesión de demo. */
   arClaimed: boolean;
+  /** Día (YYYY-MM-DD) en que se cobró el premio del juego. Uno por día. */
+  gamePlayedOn: string | null;
+}
+
+/** Fecha local en formato YYYY-MM-DD, para el límite diario del juego. */
+export function today(): string {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 }
 
 const INITIAL: State = {
@@ -24,9 +34,11 @@ const INITIAL: State = {
   linked: [],
   points: 1240,
   stamps: 5,
+  credit: 0,
   savedYtd: 168.4,
   history: SEED_HISTORY,
   arClaimed: false,
+  gamePlayedOn: null,
 };
 
 const KEY = 'primax-id-demo/v1';
@@ -109,6 +121,26 @@ export const actions = {
   },
 
   /**
+   * Canje siempre disponible: cualquier cantidad de puntos se convierte en
+   * saldo a favor, sin mínimo. Resuelve el caso del cliente que nunca llega
+   * al premio más barato y siente que sus puntos no sirven para nada.
+   */
+  redeemPointsForCredit() {
+    set((s) => ({
+      credit: money(s.credit + s.points * RULES.solesPorPunto),
+      points: 0,
+    }));
+  },
+
+  /** Premio del juego diario. Solo suma si todavía no jugó hoy. */
+  winGame(prize: number) {
+    const day = today();
+    if (state.gamePlayedOn === day) return false;
+    set((s) => ({ points: s.points + prize, gamePlayedOn: day }));
+    return true;
+  },
+
+  /**
    * Registra la compra: una sola transacción que mueve varios programas a la vez.
    * Es lo que hoy es imposible, porque cada uno vive en una app distinta.
    */
@@ -128,6 +160,7 @@ export const actions = {
     set((s) => ({
       points: s.points - b.pointsSpent + b.earn.points,
       stamps: s.stamps - b.stampsSpent + b.earn.stamps,
+      credit: money(s.credit - b.creditSpent),
       savedYtd: money(s.savedYtd + b.discount),
       history: [entry, ...s.history],
     }));

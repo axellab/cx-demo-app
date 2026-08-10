@@ -33,16 +33,19 @@ export interface WalletState {
   points: number;
   stamps: number;
   hasConvenio: boolean;
+  /** Saldo a favor en soles (puntos ya canjeados por descuento directo). */
+  credit: number;
 }
 
 export interface Selection {
   convenio: boolean;
   cupon: boolean;
+  credito: boolean;
   bonusPts: number;
 }
 
 export interface BenefitRow {
-  id: 'convenio' | 'cupon' | 'bonuspaga';
+  id: 'convenio' | 'cupon' | 'credito' | 'bonuspaga';
   program: ProgramId;
   title: string;
   detail: string;
@@ -63,6 +66,7 @@ export interface Breakdown {
   total: number;
   pointsSpent: number;
   stampsSpent: number;
+  creditSpent: number;
   maxBonusPts: number;
   earn: { points: number; stamps: number; notes: string[] };
   programsTouched: ProgramId[];
@@ -122,8 +126,14 @@ export function computeBreakdown(p: Purchase, w: WalletState, sel: Selection): B
   const cuponAmount = cuponApplies ? money(Math.min(RULES.valorCupon, st.store)) : 0;
   const cuponOn = cuponApplies && sel.cupon;
 
-  /* ── 3. BonusPaga sobre el saldo restante ───────────────────── */
-  const afterOthers = money(st.gross - (convenioOn ? convenioAmount : 0) - (cuponOn ? cuponAmount : 0));
+  /* ── 3. Saldo a favor (puntos ya canjeados) ─────────────────── */
+  const afterDiscounts = money(st.gross - (convenioOn ? convenioAmount : 0) - (cuponOn ? cuponAmount : 0));
+  const creditApplies = w.credit > 0 && afterDiscounts > 0;
+  const creditAmount = creditApplies ? money(Math.min(w.credit, afterDiscounts)) : 0;
+  const creditOn = creditApplies && sel.credito;
+
+  /* ── 4. BonusPaga sobre lo que todavía queda ────────────────── */
+  const afterOthers = money(afterDiscounts - (creditOn ? creditAmount : 0));
   const maxBonusPts = Math.max(0, Math.min(w.points, Math.round(afterOthers / RULES.solesPorPunto)));
   const bonusApplies = w.points > 0 && afterOthers > 0;
   const pointsSpent = bonusApplies ? Math.max(0, Math.min(sel.bonusPts, maxBonusPts)) : 0;
@@ -163,6 +173,19 @@ export function computeBreakdown(p: Purchase, w: WalletState, sel: Selection): B
       enabled: cuponOn,
     },
     {
+      id: 'credito',
+      program: 'bonus',
+      title: 'Saldo a favor',
+      detail: creditApplies
+        ? `Tenés S/ ${w.credit.toFixed(2)} de puntos que ya canjeaste`
+        : 'No tenés saldo a favor',
+      amount: creditOn ? creditAmount : 0,
+      applies: creditApplies,
+      reason: creditApplies ? undefined : 'Canjeá puntos por saldo desde Beneficios',
+      locked: false,
+      enabled: creditOn,
+    },
+    {
       id: 'bonuspaga',
       program: 'bonus',
       title: 'BonusPaga',
@@ -177,7 +200,12 @@ export function computeBreakdown(p: Purchase, w: WalletState, sel: Selection): B
     },
   ];
 
-  const discount = money((convenioOn ? convenioAmount : 0) + (cuponOn ? cuponAmount : 0) + bonusAmount);
+  const discount = money(
+    (convenioOn ? convenioAmount : 0) +
+      (cuponOn ? cuponAmount : 0) +
+      (creditOn ? creditAmount : 0) +
+      bonusAmount,
+  );
   const total = money(st.gross - discount);
 
   /* ── Lo que el cliente suma con esta misma compra ────────────── */
@@ -208,6 +236,7 @@ export function computeBreakdown(p: Purchase, w: WalletState, sel: Selection): B
     total,
     pointsSpent,
     stampsSpent: cuponOn ? RULES.sellosParaCupon : 0,
+    creditSpent: creditOn ? creditAmount : 0,
     maxBonusPts,
     earn: { points: earnPoints, stamps: earnStamps, notes },
     programsTouched,
@@ -219,6 +248,7 @@ export function computeBreakdown(p: Purchase, w: WalletState, sel: Selection): B
  * el cliente hoy tiene que armar a mano entre tres canales distintos.
  */
 export function bestSelection(p: Purchase, w: WalletState): Selection {
-  const probe = computeBreakdown(p, w, { convenio: true, cupon: true, bonusPts: 0 });
-  return { convenio: true, cupon: true, bonusPts: probe.maxBonusPts };
+  const base = { convenio: true, cupon: true, credito: true };
+  const probe = computeBreakdown(p, w, { ...base, bonusPts: 0 });
+  return { ...base, bonusPts: probe.maxBonusPts };
 }
