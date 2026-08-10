@@ -180,7 +180,23 @@ al logo” no funcionaba** — no era el código.
 Agravante: la imagen original desde la que se compiló ese `.mind` (`logo.jpg`) **no está en el
 repositorio**, así que ni siquiera se podía saber a qué apuntar exactamente.
 
-### Cómo generar un marcador que sí funcione
+### El marcador actual
+
+Ya está resuelto: el `public/targets.mind` del repo se compiló desde
+**`public/herramientas/marcador-primax.png`**, que está versionado al lado. Para probar el reto,
+**imprimí ese PNG** en A5 o más grande, o mostralo en la pantalla de otro dispositivo, y apuntá la
+cámara ahí.
+
+La diferencia contra el marcador heredado, medida sobre los dos archivos:
+
+| | Viejo (el logo) | Actual |
+| --- | --- | --- |
+| Imagen | 611 × 343 | 600 × 600 |
+| Niveles de detección | 7 | 9 |
+| **Puntos de detección** | 472 | **2.504** |
+| Puntos de seguimiento | 25 / 25 | 46 / 38 |
+
+### Cómo regenerarlo, si hace falta cambiar el marcador
 
 Hay una herramienta incluida en el proyecto:
 
