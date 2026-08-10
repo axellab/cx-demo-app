@@ -1,4 +1,5 @@
-/* Deck: Primax ID — 5 casos de uso. Paleta tomada de la marca real.
+/* Deck: Primax ID — 5 casos de uso + enfoque y arquitectura.
+ * Paleta tomada de la marca real.
  *
  * Regenera Primax-ID-5-casos-de-uso.pptx. Las dependencias son de este script,
  * no de la app, así que van aparte para no ensuciar el package.json del proyecto:
@@ -79,8 +80,10 @@ function iconDot(slide, { x, y, d = 0.62, color, img }) {
   slide.addImage({ data: img, x: x + d * 0.235, y: y + d * 0.235, w: d * 0.53, h: d * 0.53 });
 }
 
-function header(slide, n, title, sub) {
-  slide.addText(`CASO DE USO ${n}`, {
+/** `kicker` va completo: los casos de uso pasan "CASO DE USO 0N" y las
+ *  láminas de cierre su propio rótulo. */
+function header(slide, kicker, title, sub) {
+  slide.addText(kicker, {
     x: M, y: 0.5, w: 6, h: 0.3, fontFace: F.body, fontSize: 11.5, bold: true,
     color: C.amber, charSpacing: 2.4, margin: 0,
   });
@@ -126,13 +129,13 @@ function footNote(slide, text) {
   const p = new pptxgen();
   p.layout = 'LAYOUT_WIDE';
   p.author = 'Primax ID';
-  p.title = 'Primax ID · 5 casos de uso';
+  p.title = 'Primax ID · casos de uso, enfoque y arquitectura';
 
   /* ══════════ 1 · Identidad única ══════════ */
   {
     const s = p.addSlide();
     s.background = { data: bgA };
-    header(s, '01', 'Una sola identidad para todos sus programas',
+    header(s, 'CASO DE USO 01', 'Una sola identidad para todos sus programas',
       'Hoy el cliente hace malabares entre dos apps, tres portales y una tarjeta.');
 
     card(s, { x: M, y: 2.35, w: 6.0, h: 4.15, fill: C.cardHoy });
@@ -191,7 +194,7 @@ function footNote(slide, text) {
   {
     const s = p.addSlide();
     s.background = { data: bgB };
-    header(s, '02', 'Todo lo que tiene, en una sola cifra',
+    header(s, 'CASO DE USO 02', 'Todo lo que tiene, en una sola cifra',
       'Por primera vez el cliente sabe cuánto vale lo que acumuló, sumando todos los programas.');
 
     card(s, { x: M, y: 2.35, w: 5.3, h: 4.15 });
@@ -231,7 +234,7 @@ function footNote(slide, text) {
   {
     const s = p.addSlide();
     s.background = { data: bgA };
-    header(s, '03', 'Un solo código, y la mejor combinación calculada sola',
+    header(s, 'CASO DE USO 03', 'Un solo código, y la mejor combinación calculada sola',
       'El mismo QR sirve en playa, tienda LiSTO! y Primax Gas. La app arma el mejor precio antes de pagar.');
 
     card(s, { x: M, y: 2.35, w: 6.55, h: 4.15 });
@@ -289,7 +292,7 @@ function footNote(slide, text) {
   {
     const s = p.addSlide();
     s.background = { data: bgB };
-    header(s, '04', 'Una sola historia, y puntos que siempre sirven',
+    header(s, 'CASO DE USO 04', 'Una sola historia, y puntos que siempre sirven',
       'Todo lo que pasó con Primax en una línea de tiempo, y ningún saldo que quede inservible.');
 
     card(s, { x: M, y: 2.35, w: 5.95, h: 4.15 });
@@ -341,7 +344,7 @@ function footNote(slide, text) {
   {
     const s = p.addSlide();
     s.background = { data: bgA };
-    header(s, '05', 'Mecánicas que hacen volver a la estación',
+    header(s, 'CASO DE USO 05', 'Mecánicas que hacen volver a la estación',
       'Premios chicos, límites diarios y retos de visita: más frecuencia sin comprometer el programa de puntos.');
 
     const items = [
@@ -362,6 +365,110 @@ function footNote(slide, text) {
 
     footNote(s, 'El costo por punto entregado es bajo y está acotado por día — el retorno está en la visita, no en el premio.');
     s.addNotes('Cerrar la demo acá. El memotest se puede jugar en vivo en 30 segundos; el reto AR necesita el marcador impreso.');
+  }
+
+  /* ══════════ 6 · Enfoque y roadmap ══════════ */
+  {
+    const s = p.addSlide();
+    s.background = { data: bgB };
+    header(s, 'NUESTRO ENFOQUE', 'Cómo lo llevamos de la demo a producción',
+      'En capas: primero la identidad, después el pago, el engagement encima. Sin big bang y sin frenar la operación actual.');
+
+    card(s, { x: M, y: 2.35, w: 4.35, h: 4.07 });
+    const principios = [
+      ['La identidad primero', 'Sin un ID único de cliente no hay nada que unificar.', ic.fingerprint],
+      ['Orquestar, no migrar', 'Cada programa sigue en su sistema; la app los coordina.', ic.route],
+      ['Las reglas, en un solo lugar', 'Un motor central y versionado, no reglas repartidas.', ic.star],
+      ['Entregar por valor', 'Cada fase sale con algo que el cliente final nota.', ic.trophy],
+    ];
+    principios.forEach(([t, d, img], i) => {
+      const y = 2.62 + i * 0.97;
+      iconDot(s, { x: M + 0.35, y, d: 0.44, color: C.orange, img });
+      s.addText(t, { x: M + 0.92, y: y + 0.04, w: 3.1, h: 0.3, fontFace: F.body, fontSize: 13.5, bold: true, color: C.white, margin: 0 });
+      s.addText(d, { x: M + 0.35, y: y + 0.46, w: 3.67, h: 0.48, fontFace: F.body, fontSize: 11, color: C.muted, margin: 0, lineSpacing: 15 });
+    });
+
+    const fases = [
+      ['0', 'Descubrimiento', '4 a 6 semanas', 'Inventario de sistemas y reglas reales, definición del ID único y arquitectura objetivo.'],
+      ['1', 'Identidad y billetera', '3 a 4 meses', 'Login único, vinculación de programas, saldo consolidado e historial. Piloto acotado.'],
+      ['2', 'Pago y motor de beneficios', '3 a 4 meses', 'QR único integrado al POS. Convenio, sellos y BonusPaga resueltos en una sola transacción.'],
+      ['3', 'Engagement y expansión', 'continuo', 'Retos, gamificación y personalización. Gas y lubricantes entran al mismo flujo.'],
+    ];
+    fases.forEach(([n, t, plazo, d], i) => {
+      const y = 2.35 + i * 1.05;
+      card(s, { x: 5.3, y, w: 7.33, h: 0.92 });
+      s.addShape('ellipse', { x: 5.6, y: y + 0.26, w: 0.4, h: 0.4, fill: { color: C.orange }, line: { color: C.orange, width: 0 } });
+      s.addText(n, { x: 5.6, y: y + 0.29, w: 0.4, h: 0.34, fontFace: F.head, fontSize: 15, bold: true, color: C.white, margin: 0, align: 'center' });
+      s.addText(`Fase ${n} · ${t}`, { x: 6.15, y: y + 0.13, w: 4.1, h: 0.3, fontFace: F.body, fontSize: 14, bold: true, color: C.white, margin: 0 });
+      s.addText(plazo, { x: 10.3, y: y + 0.13, w: 2.0, h: 0.3, fontFace: F.body, fontSize: 12, bold: true, color: C.amber, margin: 0, align: 'right' });
+      s.addText(d, { x: 6.15, y: y + 0.47, w: 6.15, h: 0.4, fontFace: F.body, fontSize: 11, color: C.muted, margin: 0, lineSpacing: 15 });
+    });
+
+    footNote(s, 'Plazos estimados, para dimensionar. Bonus es un programa de consorcio con Cencosud y Delosi: se integra, no se absorbe — el enfoque lo respeta desde el primer día.');
+    s.addNotes('Si preguntan por el orden: la identidad va primero porque sin ID único no hay nada que unificar. El pago va segundo porque es donde está el ahorro visible, pero necesita integración con POS y por eso no puede ser lo primero.');
+  }
+
+  /* ══════════ 7 · Arquitectura ══════════ */
+  {
+    const s = p.addSlide();
+    s.background = { data: bgA };
+    header(s, 'CÓMO SE CONSTRUYE', 'Una capa de orquestación sobre lo que ya existe',
+      'La app no reemplaza a Bonus, a Convenios ni al POS de la estación: los coordina detrás de una sola experiencia.');
+
+    const DX = M, DW = 7.55;
+    const capa = (y, texto) => {
+      s.addText(texto, {
+        x: DX, y, w: DW, h: 0.24, fontFace: F.body, fontSize: 10, bold: true,
+        color: C.amber, charSpacing: 1.8, margin: 0,
+      });
+    };
+
+    capa(2.35, 'EXPERIENCIA');
+    card(s, { x: DX, y: 2.6, w: DW, h: 0.5 });
+    s.addText('App Primax ID · una sola app para el cliente final', {
+      x: DX, y: 2.6, w: DW, h: 0.5, fontFace: F.body, fontSize: 13, bold: true, color: C.white, align: 'center', valign: 'middle', margin: 0,
+    });
+
+    capa(3.26, 'ORQUESTACIÓN');
+    card(s, { x: DX, y: 3.51, w: DW, h: 0.5 });
+    s.addText('API única (BFF) · contratos versionados, una sola integración para el front', {
+      x: DX, y: 3.51, w: DW, h: 0.5, fontFace: F.body, fontSize: 12.5, color: C.white, align: 'center', valign: 'middle', margin: 0,
+    });
+
+    capa(4.17, 'SERVICIOS');
+    ['Identidad', 'Motor de beneficios', 'Billetera y saldos', 'Transacciones'].forEach((t, i) => {
+      const x = DX + i * 1.91;
+      card(s, { x, y: 4.42, w: 1.82, h: 0.72 });
+      s.addText(t, { x, y: 4.42, w: 1.82, h: 0.72, fontFace: F.body, fontSize: 11.5, bold: true, color: C.white, align: 'center', valign: 'middle', margin: 0 });
+    });
+
+    capa(5.3, 'CONECTORES A LOS SISTEMAS ACTUALES');
+    ['Bonus', 'Sellos LiSTO!', 'Convenios', 'POS estación', 'Primax Gas', 'Shell'].forEach((t, i) => {
+      const x = DX + i * 1.27;
+      s.addShape('roundRect', {
+        x, y: 5.55, w: 1.2, h: 0.52, rectRadius: 0.1,
+        fill: { color: '0E1746' }, line: { color: C.amber, width: 0.8, transparency: 55 },
+      });
+      s.addText(t, { x, y: 5.55, w: 1.2, h: 0.52, fontFace: F.body, fontSize: 9.5, color: C.muted, align: 'center', valign: 'middle', margin: 0 });
+    });
+
+    card(s, { x: 8.5, y: 2.35, w: 4.13, h: 3.72 });
+    s.addText('PRINCIPIOS TÉCNICOS', {
+      x: 8.83, y: 2.62, w: 3.5, h: 0.3, fontFace: F.body, fontSize: 11, bold: true,
+      color: C.amber, charSpacing: 1.8, margin: 0,
+    });
+    s.addText(
+      [
+        { text: 'Motor de reglas como servicio, con simulación: cambiar un beneficio no es un release de la app.', options: { bullet: true, breakLine: true } },
+        { text: 'Idempotencia y conciliación en cada transacción — una compra impacta tres programas.', options: { bullet: true, breakLine: true } },
+        { text: 'Degradación elegante: si un conector se cae, la app sigue mostrando el resto.', options: { bullet: true, breakLine: true } },
+        { text: 'Consentimiento y datos personales por diseño (Ley 29733).', options: { bullet: true } },
+      ],
+      { x: 8.83, y: 3.05, w: 3.5, h: 2.85, fontFace: F.body, fontSize: 11.5, color: C.white, margin: 0, paraSpaceAfter: 11, lineSpacing: 15 },
+    );
+
+    footNote(s, 'La demo ya tiene esta forma: el motor de beneficios es una función aislada y los conectores de hoy son datos mock.');
+    s.addNotes('El punto de esta lámina es bajar el riesgo percibido: no se toca lo que hoy funciona. Si preguntan por el esfuerzo de integración, la respuesta está en la Fase 0 del roadmap.');
   }
 
   await p.writeFile({ fileName: OUT });
