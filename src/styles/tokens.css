@@ -1,0 +1,61 @@
+/* ============================================================
+   Design tokens · Primax ID
+   Colores muestreados del logo real (public/logo-wordmark.jpg):
+   azul royal del wordmark + degradado naranja→ámbar del isotipo.
+   El prototipo original usaba un azul marino (#0B2E5B) bastante
+   más apagado que el de marca; acá se corrige.
+   ============================================================ */
+
+:root {
+  /* ── Marca ───────────────────────────────────────────────── */
+  --blue: #1e2fa0;
+  --blue-600: #182782;
+  --blue-800: #101b6b;
+  --blue-900: #0b1350;
+  --orange: #f4610c;
+  --orange-400: #ff8a3d;
+  --amber: #fba919;
+
+  /* ── Superficies ─────────────────────────────────────────── */
+  --bg: #f4f6fb;
+  --card: #ffffff;
+  --line: #e8edf6;
+  --ink: #131a3a;
+  --ink-2: #46507a;
+  --muted: #7b86a8;
+
+  /* ── Semánticos ──────────────────────────────────────────── */
+  --success: #17a34a;
+  --danger: #e0362c;
+  --gold: #f4b400;
+
+  /* ── Identidad por programa ──────────────────────────────
+     Cada programa mantiene un color propio para que el usuario
+     siga reconociéndolos dentro de la experiencia unificada. */
+  --p-bonus: #f4610c;
+  --p-sellos: #e0362c;
+  --p-convenio: #2440c4;
+  --p-gas: #17a34a;
+  --p-shell: #eab000;
+
+  /* ── Forma ───────────────────────────────────────────────── */
+  --r-sm: 12px;
+  --r: 18px;
+  --r-lg: 24px;
+  --r-pill: 999px;
+
+  --shadow-sm: 0 2px 8px rgba(19, 26, 58, 0.06);
+  --shadow: 0 8px 24px rgba(19, 26, 58, 0.09);
+  --shadow-lg: 0 18px 44px rgba(19, 26, 58, 0.18);
+
+  /* ── Layout ──────────────────────────────────────────────── */
+  --app-w: 480px;
+  --nav-h: 74px;
+  --safe-t: env(safe-area-inset-top, 0px);
+  --safe-b: env(safe-area-inset-bottom, 0px);
+
+  /* ── Degradados reutilizables ────────────────────────────── */
+  --grad-brand: linear-gradient(135deg, var(--blue) 0%, var(--blue-800) 100%);
+  --grad-hot: linear-gradient(135deg, var(--amber) 0%, var(--orange) 100%);
+  --grad-splash: linear-gradient(165deg, #101b6b 0%, #1e2fa0 48%, #0b1350 100%);
+}

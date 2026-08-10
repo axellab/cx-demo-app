@@ -1,0 +1,433 @@
+@import './tokens.css';
+
+/* ============================================================
+   Reset + base
+   ============================================================ */
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, system-ui, sans-serif;
+  font-size: 16px;
+  line-height: 1.45;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+button,
+input,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+/* ============================================================
+   Shell de la app — móvil primero; en desktop se dibuja como
+   un teléfono, que es como se va a presentar en la reunión.
+   ============================================================ */
+.app {
+  position: relative;
+  height: 100%;
+  max-width: var(--app-w);
+  margin: 0 auto;
+  background: var(--bg);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+@media (min-width: 620px) and (min-height: 720px) {
+  body {
+    background: radial-gradient(120% 120% at 50% 0%, #223 0%, #0d1030 60%, #05061a 100%);
+    display: grid;
+    place-items: center;
+  }
+  #root {
+    height: min(880px, 94vh);
+    aspect-ratio: 420 / 880;
+  }
+  .app {
+    height: 100%;
+    border-radius: 42px;
+    box-shadow: 0 40px 90px rgba(0, 0, 0, 0.55), 0 0 0 10px #14162e, 0 0 0 12px #2a2d52;
+  }
+}
+
+/* ============================================================
+   Pantallas
+   ============================================================ */
+.screen {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--bg);
+  animation: screenIn 0.26s cubic-bezier(0.22, 0.8, 0.3, 1);
+}
+
+@keyframes screenIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
+/* Zona scrolleable de cada pantalla. El padding inferior deja
+   lugar a la botonera + el home indicator del teléfono. */
+.scroll {
+  flex: 1;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 0 1.1rem calc(var(--nav-h) + 1.6rem + var(--safe-b));
+}
+.scroll.no-nav {
+  padding-bottom: calc(1.6rem + var(--safe-b));
+}
+
+/* ============================================================
+   Topbar
+   ============================================================ */
+.topbar {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: calc(0.9rem + var(--safe-t)) 1.1rem 0.7rem;
+}
+.topbar .grow {
+  flex: 1;
+  min-width: 0;
+}
+.topbar h1 {
+  font-size: 1.05rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+.topbar .sub {
+  font-size: 0.76rem;
+  color: var(--muted);
+}
+.brand-logo {
+  height: 30px;
+  width: auto;
+  /* El asset viene con fondo blanco; multiply lo funde con el fondo claro. */
+  mix-blend-mode: multiply;
+}
+
+.icon-btn {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--card);
+  box-shadow: var(--shadow-sm);
+  display: grid;
+  place-items: center;
+  position: relative;
+  color: var(--ink);
+}
+.icon-btn.ghost {
+  background: transparent;
+  box-shadow: none;
+}
+.badge-dot {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--danger);
+  border: 2px solid var(--card);
+}
+
+/* ============================================================
+   Botones
+   ============================================================ */
+.btn {
+  border-radius: var(--r-pill);
+  font-weight: 700;
+  font-size: 0.95rem;
+  min-height: 52px;
+  padding: 0 1.6rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: transform 0.12s ease, opacity 0.15s ease;
+}
+.btn:active {
+  transform: scale(0.975);
+}
+.btn:disabled {
+  opacity: 0.45;
+  pointer-events: none;
+}
+.btn-primary {
+  background: var(--grad-hot);
+  color: #fff;
+  box-shadow: 0 10px 24px rgba(244, 97, 12, 0.32);
+}
+.btn-blue {
+  background: var(--blue);
+  color: #fff;
+  box-shadow: 0 10px 24px rgba(30, 47, 160, 0.28);
+}
+.btn-soft {
+  background: var(--card);
+  color: var(--blue);
+  box-shadow: var(--shadow-sm);
+}
+.btn-outline {
+  border: 1.5px solid rgba(255, 255, 255, 0.45);
+  color: #fff;
+}
+.btn-ghost {
+  color: var(--muted);
+  font-weight: 600;
+  min-height: 44px;
+}
+.btn-block {
+  width: 100%;
+}
+.btn-sm {
+  min-height: 40px;
+  font-size: 0.82rem;
+  padding: 0 1.1rem;
+}
+
+/* ============================================================
+   Tarjetas, secciones, chips
+   ============================================================ */
+.card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  box-shadow: var(--shadow-sm);
+  padding: 1.05rem 1.1rem;
+}
+
+.section-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin: 1.5rem 0 0.7rem;
+}
+.section-head h3 {
+  font-size: 0.98rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+.section-head button {
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: var(--orange);
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.3rem 0.65rem;
+  border-radius: var(--r-pill);
+  font-size: 0.72rem;
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.muted {
+  color: var(--muted);
+}
+.tiny {
+  font-size: 0.74rem;
+  line-height: 1.4;
+}
+.row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+.between {
+  justify-content: space-between;
+}
+
+/* Barra de progreso genérica */
+.progress {
+  height: 7px;
+  border-radius: var(--r-pill);
+  background: var(--line);
+  overflow: hidden;
+}
+.progress > i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--grad-hot);
+  transition: width 0.6s cubic-bezier(0.22, 0.8, 0.3, 1);
+}
+
+/* ============================================================
+   Botonera inferior
+   ============================================================ */
+.bottom-nav {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: calc(var(--nav-h) + var(--safe-b));
+  padding-bottom: var(--safe-b);
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(14px);
+  border-top: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  z-index: 20;
+}
+.nav-item {
+  flex: 1;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.2rem;
+  font-size: 0.64rem;
+  font-weight: 700;
+  color: var(--muted);
+  transition: color 0.15s ease;
+}
+.nav-item.active {
+  color: var(--blue);
+}
+.nav-fab {
+  flex: 0 0 auto;
+  width: 60px;
+  height: 60px;
+  margin-top: -26px;
+  border-radius: 50%;
+  background: var(--grad-hot);
+  color: #fff;
+  display: grid;
+  place-items: center;
+  box-shadow: 0 12px 26px rgba(244, 97, 12, 0.42);
+  border: 4px solid var(--card);
+  transition: transform 0.14s ease;
+}
+.nav-fab:active {
+  transform: scale(0.93);
+}
+
+/* ============================================================
+   Bottom sheet + toast
+   ============================================================ */
+.backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(10, 14, 40, 0.5);
+  backdrop-filter: blur(2px);
+  z-index: 40;
+  animation: fadeIn 0.2s ease;
+}
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+}
+
+.sheet {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 41;
+  background: var(--card);
+  border-radius: var(--r-lg) var(--r-lg) 0 0;
+  padding: 0.7rem 1.2rem calc(1.4rem + var(--safe-b));
+  max-height: 88%;
+  overflow-y: auto;
+  box-shadow: var(--shadow-lg);
+  animation: sheetUp 0.3s cubic-bezier(0.22, 0.9, 0.3, 1);
+}
+@keyframes sheetUp {
+  from {
+    transform: translateY(100%);
+  }
+}
+.sheet-grip {
+  width: 40px;
+  height: 4px;
+  border-radius: var(--r-pill);
+  background: var(--line);
+  margin: 0 auto 0.9rem;
+}
+
+.toast {
+  position: absolute;
+  left: 50%;
+  bottom: calc(var(--nav-h) + 1.2rem + var(--safe-b));
+  transform: translateX(-50%);
+  z-index: 60;
+  background: rgba(19, 26, 58, 0.95);
+  color: #fff;
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding: 0.7rem 1.1rem;
+  border-radius: var(--r-pill);
+  box-shadow: var(--shadow-lg);
+  max-width: 88%;
+  text-align: center;
+  animation: toastIn 0.25s cubic-bezier(0.22, 0.9, 0.3, 1);
+}
+@keyframes toastIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 12px);
+  }
+}
+
+/* Utilidad: oculta visualmente pero deja accesible al lector de pantalla */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

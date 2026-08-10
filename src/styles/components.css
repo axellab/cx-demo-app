@@ -1,0 +1,189 @@
+/* ============================================================
+   Componentes compartidos
+   ============================================================ */
+
+/* ── Insignia de programa ─────────────────────────────────── */
+.pbadge {
+  display: grid;
+  place-items: center;
+  border-radius: 11px;
+  color: #fff;
+  flex-shrink: 0;
+}
+.pbadge.soft {
+  background: color-mix(in srgb, currentColor 14%, transparent) !important;
+}
+
+/* ── Billetera unificada (hero del home) ──────────────────── */
+.wcard {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--r-lg);
+  padding: 1.15rem 1.2rem 1.2rem;
+  color: #fff;
+  background: var(--grad-brand);
+  box-shadow: 0 16px 36px rgba(16, 27, 107, 0.32);
+}
+.wcard::after {
+  content: '';
+  position: absolute;
+  width: 230px;
+  height: 230px;
+  border-radius: 50%;
+  top: -120px;
+  right: -80px;
+  background: radial-gradient(circle, rgba(244, 97, 12, 0.5), transparent 68%);
+}
+.wcard > * {
+  position: relative;
+  z-index: 1;
+}
+.wcard .label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.62);
+}
+.wcard .amount {
+  font-size: 2.3rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  margin-top: 0.15rem;
+}
+.wcard .amount small {
+  font-size: 1.1rem;
+  font-weight: 700;
+  opacity: 0.7;
+  margin-right: 0.15rem;
+}
+.wcard .sub {
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.7);
+  margin-top: 0.1rem;
+}
+.wcard .tier {
+  background: rgba(244, 180, 0, 0.18);
+  border: 1px solid rgba(244, 180, 0, 0.45);
+  color: #ffd257;
+}
+
+.wcard-chips {
+  display: flex;
+  gap: 0.4rem;
+  margin-top: 1rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding-bottom: 2px;
+}
+.wcard-chips::-webkit-scrollbar {
+  display: none;
+}
+.wcard-chip {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 0.38rem;
+  padding: 0.42rem 0.7rem;
+  border-radius: var(--r-pill);
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  font-size: 0.73rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.wcard-chip b {
+  font-weight: 800;
+}
+
+.wcard-actions {
+  display: flex;
+  gap: 0.55rem;
+  margin-top: 1rem;
+}
+.wcard-actions button {
+  flex: 1;
+  min-height: 46px;
+  border-radius: 14px;
+  font-size: 0.83rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+.wcard-actions button.hot {
+  background: var(--grad-hot);
+  border-color: transparent;
+  box-shadow: 0 8px 18px rgba(244, 97, 12, 0.35);
+}
+
+/* ── Sellos LiSTO! ────────────────────────────────────────── */
+.stamps {
+  display: flex;
+  gap: 0.45rem;
+}
+.stamp {
+  flex: 1;
+  aspect-ratio: 1;
+  max-width: 46px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  border: 2px dashed #d9e0ee;
+  color: #bcc6da;
+}
+.stamp.filled {
+  border: 2px solid var(--p-sellos);
+  background: var(--p-sellos);
+  color: #fff;
+  animation: stampPop 0.35s cubic-bezier(0.3, 1.5, 0.5, 1) backwards;
+}
+@keyframes stampPop {
+  from {
+    transform: scale(0.4);
+    opacity: 0;
+  }
+}
+
+/* ── Fila de programa (onboarding, perfil) ────────────────── */
+.prow {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 0.8rem 0;
+  border-bottom: 1px solid var(--line);
+}
+.prow:last-child {
+  border-bottom: none;
+}
+.prow .grow {
+  flex: 1;
+  min-width: 0;
+}
+.prow h4 {
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+.prow p {
+  font-size: 0.73rem;
+  color: var(--muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.prow .state {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+.prow .state.ok {
+  color: var(--success);
+}
