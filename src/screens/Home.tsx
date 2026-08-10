@@ -1,6 +1,7 @@
 import { Icon } from '../components/Icon';
 import { ProgramBadge } from '../components/ProgramBadge';
 import { StampsRow } from '../components/StampsRow';
+import { StreakRow } from '../components/StreakRow';
 import { WalletCard } from '../components/WalletCard';
 import { CHALLENGES, PROMOS } from '../data/catalog';
 import { PROGRAMS } from '../data/programs';
@@ -9,11 +10,11 @@ import { USER } from '../data/user';
 import { RULES } from '../lib/benefits';
 import { soles } from '../lib/format';
 import { useNav } from '../lib/nav';
-import { today, useStore } from '../lib/store';
+import { STREAK_GOAL, today, useStore } from '../lib/store';
 
 export function Home() {
   const { go, toast } = useNav();
-  const { stamps, gamePlayedOn } = useStore();
+  const { stamps, gamePlayedOn, streakDays } = useStore();
 
   const wonToday = gamePlayedOn === today();
   const cuponListo = stamps >= RULES.sellosParaCupon;
@@ -72,6 +73,17 @@ export function Home() {
               <span className="s-home-ready-tag">Disponible</span>
             </div>
           )}
+          {/* Racha diaria: el mismo dato que muestra la burbuja al entrar */}
+          <button className="s-home-streak" onClick={() => go('challenges')}>
+            <div className="row between" style={{ marginBottom: '.55rem' }}>
+              <span className="tiny">
+                Racha · <b>día {streakDays === 0 ? STREAK_GOAL : streakDays}</b> de {STREAK_GOAL}
+              </span>
+              <span className="tiny muted">1 sello al completarla</span>
+            </div>
+            <StreakRow filled={streakDays} compact />
+          </button>
+
           <div className="s-home-tier">
             <div className="row between" style={{ marginBottom: '.5rem' }}>
               <span className="tiny">

@@ -150,6 +150,116 @@
   }
 }
 
+/* ── Racha diaria: fila de 10 casilleros ──────────────────── */
+.streak-row {
+  display: flex;
+  gap: 0.3rem;
+}
+.streak-slot {
+  flex: 1;
+  aspect-ratio: 1;
+  max-width: 34px;
+  border-radius: 9px;
+  display: grid;
+  place-items: center;
+  font-size: 0.68rem;
+  font-weight: 700;
+  border: 1.5px dashed #d9e0ee;
+  color: #b9c2d6;
+  background: transparent;
+}
+.streak-row.compact .streak-slot {
+  max-width: 26px;
+  border-radius: 7px;
+  font-size: 0.6rem;
+}
+.streak-slot.on {
+  border: 1.5px solid var(--p-sellos);
+  background: var(--p-sellos);
+  color: #fff;
+}
+/* El casillero que se marca al entrar: aparece con un golpe y un halo. */
+.streak-slot.new {
+  animation: streakPop 0.5s cubic-bezier(0.3, 1.6, 0.5, 1) 0.25s backwards;
+  box-shadow: 0 0 0 4px rgba(224, 54, 44, 0.22);
+}
+@keyframes streakPop {
+  0% {
+    transform: scale(0.3) rotate(-12deg);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.18) rotate(3deg);
+  }
+}
+
+/* ── Burbuja de aviso de la racha ─────────────────────────── */
+.streak-bubble {
+  position: absolute;
+  top: calc(0.7rem + var(--safe-t));
+  left: 0.7rem;
+  right: 0.7rem;
+  z-index: 70;
+  background: rgba(255, 255, 255, 0.97);
+  backdrop-filter: blur(14px);
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  padding: 0.85rem 0.9rem 0.95rem;
+  box-shadow: 0 18px 44px rgba(19, 26, 58, 0.28);
+  cursor: pointer;
+  animation: bubbleDrop 0.45s cubic-bezier(0.22, 1.2, 0.4, 1);
+}
+@keyframes bubbleDrop {
+  from {
+    opacity: 0;
+    transform: translateY(-120%);
+  }
+}
+.streak-bubble.win {
+  background: linear-gradient(135deg, #fff 0%, #fff6ee 100%);
+  border-color: rgba(244, 97, 12, 0.35);
+}
+.streak-bubble-top {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  margin-bottom: 0.75rem;
+}
+.streak-bubble-top .grow {
+  flex: 1;
+  min-width: 0;
+}
+.streak-bubble h4 {
+  font-size: 0.88rem;
+  font-weight: 800;
+}
+.streak-bubble p {
+  font-size: 0.74rem;
+  color: var(--muted);
+  margin-top: 0.1rem;
+  line-height: 1.35;
+}
+.streak-bubble-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  background: var(--grad-hot);
+  flex-shrink: 0;
+}
+.streak-bubble-x {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: var(--muted);
+  background: var(--bg);
+  flex-shrink: 0;
+}
+
 /* ── Fila de programa (onboarding, perfil) ────────────────── */
 .prow {
   display: flex;

@@ -1,7 +1,8 @@
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { BottomNav } from './components/BottomNav';
+import { StreakBubble } from './components/StreakBubble';
 import { NavCtx, TABS, type Nav, type ScreenId } from './lib/nav';
-import { useStore } from './lib/store';
+import { actions, useStore } from './lib/store';
 import type { Breakdown } from './lib/benefits';
 import type { Context, Purchase } from './types';
 
@@ -59,6 +60,15 @@ export default function App() {
     toastTimer.current = window.setTimeout(() => setToastMsg(null), 2600);
   }, []);
 
+  /* La racha se cuenta al llegar al home, una sola vez por sesión.
+     La acción es idempotente por día, así que volver al home no la repite. */
+  const checkedIn = useRef(false);
+  useEffect(() => {
+    if (screen !== 'home' || checkedIn.current) return;
+    checkedIn.current = true;
+    actions.checkInStreak();
+  }, [screen]);
+
   const nav = useMemo<Nav>(() => ({ screen, go, back, toast }), [screen, go, back, toast]);
 
   return (
@@ -87,6 +97,7 @@ export default function App() {
         {screen === 'profile' && <Profile />}
 
         {WITH_NAV.includes(screen) && <BottomNav />}
+        <StreakBubble />
         {toastMsg && <div className="toast">{toastMsg}</div>}
       </div>
     </NavCtx.Provider>

@@ -1,16 +1,19 @@
 import { Icon } from '../components/Icon';
+import { StreakRow } from '../components/StreakRow';
 import { CHALLENGES } from '../data/catalog';
 import { useNav } from '../lib/nav';
-import { today, useStore } from '../lib/store';
+import { STREAK_GOAL, today, useStore } from '../lib/store';
 
 export function Challenges() {
   const { go, toast } = useNav();
-  const { arClaimed, gamePlayedOn } = useStore();
+  const { arClaimed, gamePlayedOn, streakDays, streakLastDay } = useStore();
 
   const ar = CHALLENGES.find((c) => c.kind === 'ar')!;
   const game = CHALLENGES.find((c) => c.kind === 'game')!;
+  const streak = CHALLENGES.find((c) => c.kind === 'streak')!;
   const rest = CHALLENGES.filter((c) => c.kind === 'progress');
   const wonToday = gamePlayedOn === today();
+  const contadoHoy = streakLastDay === today();
 
   return (
     <section className="screen s-chal">
@@ -34,6 +37,30 @@ export function Challenges() {
             {arClaimed ? 'Volver a jugar' : 'Activar cámara'} · {ar.reward}
           </span>
         </button>
+
+        {/* Racha diaria: un sello al entrar diez días seguidos */}
+        <div className="section-head">
+          <h3>Tu racha diaria</h3>
+          <span className="tiny muted">{contadoHoy ? 'Hoy ya cuenta' : 'Entrá hoy para sumar'}</span>
+        </div>
+        <div className="card">
+          <div className="row between" style={{ marginBottom: '.85rem' }}>
+            <div className="grow">
+              <h4 style={{ fontSize: '.9rem', fontWeight: 700 }}>{streak.title}</h4>
+              <p className="tiny muted">{streak.detail}</p>
+            </div>
+            <span className="s-chal-reward">{streak.reward}</span>
+          </div>
+          <StreakRow filled={streakDays} justChecked={contadoHoy ? streakDays : undefined} />
+          <p className="tiny muted" style={{ marginTop: '.7rem' }}>
+            {streakDays === 0
+              ? `Arrancá hoy: son ${STREAK_GOAL} días seguidos.`
+              : `Llevás ${streakDays} ${streakDays === 1 ? 'día' : 'días'} · te ${
+                  STREAK_GOAL - streakDays === 1 ? 'falta' : 'faltan'
+                } ${STREAK_GOAL - streakDays} para tu sello.`}{' '}
+            Si te salteás un día, vuelve a empezar.
+          </p>
+        </div>
 
         {/* Juego diario — pensado para que jueguen los chicos en la estación */}
         <div className="section-head">

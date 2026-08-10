@@ -277,6 +277,19 @@
   border-radius: var(--r-pill);
 }
 
+.s-home-streak {
+  display: block;
+  width: 100%;
+  text-align: left;
+  color: var(--ink);
+  padding: 0.75rem 0 0.95rem;
+  margin-bottom: 0.9rem;
+  border-bottom: 1px solid var(--line);
+}
+.s-home-streak b {
+  color: var(--p-sellos);
+}
+
 .s-home-ar,
 .s-chal-ar {
   position: relative;

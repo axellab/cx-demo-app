@@ -110,6 +110,22 @@ export function Profile() {
           <button
             className="prow s-prof-link"
             onClick={() => {
+              actions.simulateStreakFinal();
+              go('home');
+            }}
+          >
+            <span className="pbadge" style={{ width: 38, height: 38, background: 'var(--p-sellos)' }}>
+              <Icon name="flame" size={19} strokeWidth={2} />
+            </span>
+            <div className="grow">
+              <h4>Completar la racha de 10 días</h4>
+              <p>Muestra el aviso de racha cumplida y suma el sello</p>
+            </div>
+            <Icon name="right" size={18} />
+          </button>
+          <button
+            className="prow s-prof-link"
+            onClick={() => {
               actions.reset();
               toast('Demo reiniciada');
               go('splash');

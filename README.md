@@ -54,12 +54,22 @@ conviene usar, ni que una sola compra puede impactar tres programas a la vez.
 8. **Beneficios → “Descontá tus puntos de tu próxima compra”** — canje sin mínimo: cualquier saldo,
    por chico que sea, se convierte en saldo a favor y se aplica solo en el próximo pago. Resuelve al
    cliente que nunca llega al premio más barato del catálogo.
-9. **Retos y misiones** — el **Memotest Primax** (juego para los chicos, +5 pts una vez por día) y
-   **Caza el logo Primax**, el reto de realidad aumentada (necesita celular, HTTPS y el marcador
-   impreso, ver abajo).
+9. **Racha de 10 días** — al entrar al home, si la racha avanza, baja una burbuja tipo notificación
+   con la fila de 10 casilleros y el del día marcándose en vivo. A los 10 días seguidos suma un
+   sello LiSTO! y la racha vuelve a empezar. Si se saltea un día, arranca de cero.
+10. **Retos y misiones** — el **Memotest Primax** (juego para los chicos, +5 pts una vez por día) y
+    **Caza el logo Primax**, el reto de realidad aumentada (necesita celular, HTTPS y el marcador
+    impreso, ver abajo).
 
-Para repetir la demo: **Perfil → Reiniciar la demo** (vuelve a 1.240 pts, 5 sellos e historial
-original) o **Ver la unificación otra vez** (repite solo el onboarding).
+Controles de demo, en **Perfil**:
+
+- **Ver la unificación otra vez** — repite solo el onboarding.
+- **Completar la racha de 10 días** — deja la racha a un día del final y la avanza, para mostrar el
+  aviso de racha cumplida con el sello, sin esperar diez días.
+- **Reiniciar la demo** — vuelve a 1.240 pts, 5 sellos, racha en 6 e historial original.
+
+La demo arranca con la racha en **6 días** y el último ingreso marcado como ayer, para que al entrar
+se vea el casillero 7 marcándose y no una fila vacía.
 
 ---
 

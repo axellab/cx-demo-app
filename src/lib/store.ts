@@ -21,12 +21,30 @@ export interface State {
   arClaimed: boolean;
   /** Día (YYYY-MM-DD) en que se cobró el premio del juego. Uno por día. */
   gamePlayedOn: string | null;
+  /** Días seguidos entrando a la app, de 0 a STREAK_GOAL. */
+  streakDays: number;
+  /** Último día contabilizado para la racha. */
+  streakLastDay: string | null;
+  /** Aviso a mostrar cuando la racha avanza. No se persiste. */
+  streakToast: { day: number; earnedStamp: boolean } | null;
 }
 
-/** Fecha local en formato YYYY-MM-DD, para el límite diario del juego. */
-export function today(): string {
-  const d = new Date();
+/** Días seguidos que hay que entrar para ganar el sello. */
+export const STREAK_GOAL = 10;
+
+function ymd(d: Date): string {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
+/** Fecha local en formato YYYY-MM-DD, para los límites diarios. */
+export function today(): string {
+  return ymd(new Date());
+}
+
+function yesterday(): string {
+  const d = new Date();
+  d.setDate(d.getDate() - 1);
+  return ymd(d);
 }
 
 const INITIAL: State = {
@@ -39,6 +57,11 @@ const INITIAL: State = {
   history: SEED_HISTORY,
   arClaimed: false,
   gamePlayedOn: null,
+  // Arranca con racha empezada para que en la demo se vea el progreso real,
+  // y no una fila vacía en el día 1.
+  streakDays: 6,
+  streakLastDay: yesterday(),
+  streakToast: null,
 };
 
 const KEY = 'primax-id-demo/v1';
@@ -48,7 +71,8 @@ function load(): State {
     const raw = localStorage.getItem(KEY);
     if (!raw) return INITIAL;
     // Merge sobre INITIAL para que agregar campos nuevos no rompa una demo ya guardada.
-    return { ...INITIAL, ...(JSON.parse(raw) as Partial<State>) };
+    // streakToast es transitorio: nunca se restaura, para que recargar no lo repita.
+    return { ...INITIAL, ...(JSON.parse(raw) as Partial<State>), streakToast: null };
   } catch {
     return INITIAL;
   }
@@ -130,6 +154,42 @@ export const actions = {
       credit: money(s.credit + s.points * RULES.solesPorPunto),
       points: 0,
     }));
+  },
+
+  /**
+   * Registra la visita del día para la racha. Se llama al llegar al home.
+   *
+   * Si entró ayer, la racha sigue; si se saltó un día, vuelve a empezar en 1.
+   * Al llegar a STREAK_GOAL suma un sello LiSTO! y la racha arranca de cero,
+   * para que la mecánica se pueda repetir.
+   */
+  checkInStreak() {
+    const t = today();
+    if (state.streakLastDay === t) return; // ya contamos hoy
+
+    const seguido = state.streakLastDay === yesterday();
+    const dia = seguido ? state.streakDays + 1 : 1;
+
+    if (dia >= STREAK_GOAL) {
+      set((s) => ({
+        streakDays: 0,
+        streakLastDay: t,
+        stamps: s.stamps + 1,
+        streakToast: { day: STREAK_GOAL, earnedStamp: true },
+      }));
+      return;
+    }
+    set({ streakDays: dia, streakLastDay: t, streakToast: { day: dia, earnedStamp: false } });
+  },
+
+  dismissStreakToast() {
+    set({ streakToast: null });
+  },
+
+  /** Control de demo: deja la racha a un día de completarse y la avanza. */
+  simulateStreakFinal() {
+    set({ streakDays: STREAK_GOAL - 1, streakLastDay: yesterday() });
+    actions.checkInStreak();
   },
 
   /** Premio del juego diario. Solo suma si todavía no jugó hoy. */

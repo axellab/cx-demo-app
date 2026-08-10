@@ -75,8 +75,8 @@ export interface Challenge {
   reward: string;
   progress: number;
   goal: number;
-  /** 'ar' abre la cámara y 'game' el memotest; ninguno muestra barra de progreso. */
-  kind: 'progress' | 'ar' | 'game';
+  /** 'ar' abre la cámara, 'game' el memotest y 'streak' dibuja la fila de días. */
+  kind: 'progress' | 'ar' | 'game' | 'streak';
 }
 
 export const CHALLENGES: Challenge[] = [
@@ -97,6 +97,15 @@ export const CHALLENGES: Challenge[] = [
     progress: 0,
     goal: 1,
     kind: 'game',
+  },
+  {
+    id: 'racha',
+    title: 'Racha de 10 días',
+    detail: 'Entrá a la app 10 días seguidos, sin faltar ninguno',
+    reward: '+1 sello LiSTO!',
+    progress: 0, // se reemplaza con el valor real del store
+    goal: 10,
+    kind: 'streak',
   },
   {
     id: 'visitas',
