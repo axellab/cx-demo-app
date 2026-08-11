@@ -98,9 +98,20 @@ export function Onboarding({ onDone }: { onDone: () => void }) {
                   <Icon name="link" size={19} strokeWidth={2.2} />
                   Unificar mis programas
                 </button>
-                <p className="tiny muted" style={{ textAlign: 'center', marginTop: '.8rem' }}>
+                {/* Vincular es una decisión del cliente, no un peaje para entrar.
+                    El "ahora no" tiene que estar visible, aunque sin competir. */}
+                <button
+                  className="btn btn-ghost btn-block s-onb-skip"
+                  onClick={() => {
+                    actions.skipOnboarding();
+                    onDone();
+                  }}
+                >
+                  Ahora no
+                </button>
+                <p className="tiny muted" style={{ textAlign: 'center', marginTop: '.5rem' }}>
                   Verificamos tu identidad con tu {USER.doc.split(' ')[0]} y tu celular. No hace falta
-                  crear nada nuevo.
+                  crear nada nuevo, y podés vincularlos cuando quieras.
                 </p>
               </>
             )}

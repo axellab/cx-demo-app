@@ -110,7 +110,7 @@ export function Profile() {
           <button
             className="prow s-prof-link"
             onClick={() => {
-              actions.simulateStreakFinal();
+              actions.simulateVisitsFinal();
               go('home');
             }}
           >
@@ -118,8 +118,8 @@ export function Profile() {
               <Icon name="flame" size={19} strokeWidth={2} />
             </span>
             <div className="grow">
-              <h4>Completar la racha de 10 días</h4>
-              <p>Muestra el aviso de racha cumplida y suma el sello</p>
+              <h4>Completar las 10 visitas del mes</h4>
+              <p>Muestra el aviso de meta cumplida y suma el sello</p>
             </div>
             <Icon name="right" size={18} />
           </button>

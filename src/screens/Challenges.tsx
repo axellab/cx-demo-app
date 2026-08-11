@@ -2,18 +2,18 @@ import { Icon } from '../components/Icon';
 import { StreakRow } from '../components/StreakRow';
 import { CHALLENGES } from '../data/catalog';
 import { useNav } from '../lib/nav';
-import { STREAK_GOAL, today, useStore } from '../lib/store';
+import { today, useStore, VISITS_GOAL } from '../lib/store';
 
 export function Challenges() {
   const { go, toast } = useNav();
-  const { arClaimed, gamePlayedOn, streakDays, streakLastDay } = useStore();
+  const { arClaimed, gamePlayedOn, visits, lastVisitDay } = useStore();
 
   const ar = CHALLENGES.find((c) => c.kind === 'ar')!;
   const game = CHALLENGES.find((c) => c.kind === 'game')!;
   const streak = CHALLENGES.find((c) => c.kind === 'streak')!;
   const rest = CHALLENGES.filter((c) => c.kind === 'progress');
   const wonToday = gamePlayedOn === today();
-  const contadoHoy = streakLastDay === today();
+  const contadoHoy = lastVisitDay === today();
 
   return (
     <section className="screen s-chal">
@@ -38,9 +38,9 @@ export function Challenges() {
           </span>
         </button>
 
-        {/* Racha diaria: un sello al entrar diez días seguidos */}
+        {/* Visitas del mes: un sello al llegar a diez */}
         <div className="section-head">
-          <h3>Tu racha diaria</h3>
+          <h3>Tus visitas del mes</h3>
           <span className="tiny muted">{contadoHoy ? 'Hoy ya cuenta' : 'Entrá hoy para sumar'}</span>
         </div>
         <div className="card">
@@ -51,14 +51,15 @@ export function Challenges() {
             </div>
             <span className="s-chal-reward">{streak.reward}</span>
           </div>
-          <StreakRow filled={streakDays} justChecked={contadoHoy ? streakDays : undefined} />
+          <StreakRow filled={visits} justChecked={contadoHoy ? visits : undefined} />
           <p className="tiny muted" style={{ marginTop: '.7rem' }}>
-            {streakDays === 0
-              ? `Arrancá hoy: son ${STREAK_GOAL} días seguidos.`
-              : `Llevás ${streakDays} ${streakDays === 1 ? 'día' : 'días'} · te ${
-                  STREAK_GOAL - streakDays === 1 ? 'falta' : 'faltan'
-                } ${STREAK_GOAL - streakDays} para tu sello.`}{' '}
-            Si te salteás un día, vuelve a empezar.
+            {visits === 0
+              ? `Arrancá cuando quieras: son ${VISITS_GOAL} visitas dentro del mes.`
+              : `Llevás ${visits} ${visits === 1 ? 'visita' : 'visitas'} · te ${
+                  VISITS_GOAL - visits === 1 ? 'falta' : 'faltan'
+                } ${VISITS_GOAL - visits} para tu sello.`}{' '}
+            No hace falta que sean días seguidos: cuenta una visita por día y el contador se renueva
+            cada mes.
           </p>
         </div>
 

@@ -33,6 +33,11 @@ conviene usar, ni que una sola compra puede impactar tres programas a la vez.
 2. **Onboarding "antes y después"** — la pantalla lista los seis programas con el canal en el que
    viven hoy. Tocá **Unificar mis programas** y se vinculan a la identidad única.
    *Este es el momento en que el cliente ve su propio problema dibujado.*
+
+   Al lado hay un **"Ahora no"**: vincular es una decisión del cliente, no un peaje para poder usar
+   la app. Si lo toca, entra igual, pero la billetera muestra la invitación en lugar de un saldo que
+   todavía no autorizó a leer — y puede vincular después desde ahí o desde Perfil. Vale la pena
+   mostrarlo en la demo: responde sola la objeción de "¿me obligan a dar mis datos?".
 3. **Home** — la billetera muestra **un solo valor en soles** (S/ 17.90) con el desglose por
    programa, y la tarjeta contextual dice el precio que **paga esta persona**, con el convenio ya
    aplicado.
@@ -54,9 +59,10 @@ conviene usar, ni que una sola compra puede impactar tres programas a la vez.
 8. **Beneficios → “Descontá tus puntos de tu próxima compra”** — canje sin mínimo: cualquier saldo,
    por chico que sea, se convierte en saldo a favor y se aplica solo en el próximo pago. Resuelve al
    cliente que nunca llega al premio más barato del catálogo.
-9. **Racha de 10 días** — al entrar al home, si la racha avanza, baja una burbuja tipo notificación
-   con la fila de 10 casilleros y el del día marcándose en vivo. A los 10 días seguidos suma un
-   sello LiSTO! y la racha vuelve a empezar. Si se saltea un día, arranca de cero.
+9. **10 visitas en el mes** — al entrar al home baja una burbuja tipo notificación con la fila de
+   10 casilleros y el de hoy marcándose en vivo. Cuenta **una visita por día**, dentro del mes en
+   curso: no hace falta que sean días seguidos y saltarse un día no penaliza. Al llegar a 10 suma
+   un sello LiSTO! y el contador vuelve a cero; al cambiar de mes, también.
 10. **Retos y misiones** — el **Memotest Primax** (juego para los chicos, +5 pts una vez por día) y
     **Caza el logo Primax**, el reto de realidad aumentada (necesita celular, HTTPS y el marcador
     impreso, ver abajo).
@@ -76,12 +82,12 @@ pierde lo que venía haciendo. En **Perfil → Copiar link para otra persona** l
 Controles de demo, en **Perfil**:
 
 - **Ver la unificación otra vez** — repite solo el onboarding.
-- **Completar la racha de 10 días** — deja la racha a un día del final y la avanza, para mostrar el
-  aviso de racha cumplida con el sello, sin esperar diez días.
-- **Reiniciar la demo** — vuelve a 1.240 pts, 5 sellos, racha en 6 e historial original.
+- **Completar las 10 visitas del mes** — deja el contador a una visita del final y la suma, para
+  mostrar el aviso de meta cumplida con el sello sin tener que esperar.
+- **Reiniciar la demo** — vuelve a 1.240 pts, 5 sellos, 6 visitas e historial original.
 
-La demo arranca con la racha en **6 días** y el último ingreso marcado como ayer, para que al entrar
-se vea el casillero 7 marcándose y no una fila vacía.
+La demo arranca con **6 visitas** y la última marcada como ayer, para que al entrar se vea el
+casillero 7 marcándose y no una fila vacía.
 
 ---
 

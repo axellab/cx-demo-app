@@ -167,6 +167,13 @@
 .s-onb-cta {
   margin-top: 1.3rem;
 }
+/* Salida visible pero sin competir con la acción principal. */
+.s-onb-skip {
+  margin-top: 0.3rem;
+  font-size: 0.85rem;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
 .s-onb-done {
   padding-top: calc(3rem + var(--safe-t));
   text-align: center;

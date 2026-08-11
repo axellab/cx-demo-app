@@ -10,11 +10,11 @@ import { USER } from '../data/user';
 import { RULES } from '../lib/benefits';
 import { soles } from '../lib/format';
 import { useNav } from '../lib/nav';
-import { STREAK_GOAL, today, useStore } from '../lib/store';
+import { today, useStore, VISITS_GOAL } from '../lib/store';
 
 export function Home() {
   const { go, toast } = useNav();
-  const { stamps, gamePlayedOn, streakDays } = useStore();
+  const { stamps, gamePlayedOn, visits, linked } = useStore();
 
   const wonToday = gamePlayedOn === today();
   const cuponListo = stamps >= RULES.sellosParaCupon;
@@ -73,15 +73,15 @@ export function Home() {
               <span className="s-home-ready-tag">Disponible</span>
             </div>
           )}
-          {/* Racha diaria: el mismo dato que muestra la burbuja al entrar */}
+          {/* Visitas del mes: el mismo dato que muestra la burbuja al entrar */}
           <button className="s-home-streak" onClick={() => go('challenges')}>
             <div className="row between" style={{ marginBottom: '.55rem' }}>
               <span className="tiny">
-                Racha · <b>día {streakDays === 0 ? STREAK_GOAL : streakDays}</b> de {STREAK_GOAL}
+                Visitas del mes · <b>{visits === 0 ? VISITS_GOAL : visits}</b> de {VISITS_GOAL}
               </span>
-              <span className="tiny muted">1 sello al completarla</span>
+              <span className="tiny muted">1 sello al completarlas</span>
             </div>
-            <StreakRow filled={streakDays} compact />
+            <StreakRow filled={visits} compact />
           </button>
 
           <div className="s-home-tier">
@@ -190,8 +190,9 @@ export function Home() {
             ))}
           </div>
           <p className="tiny muted">
-            {PROGRAMS.length} programas vinculados a tu identidad Primax. Antes eran 4 registros
-            distintos.
+            {linked.length > 0
+              ? `${linked.length} programas vinculados a tu identidad Primax. Antes eran 4 registros distintos.`
+              : `Tenés ${PROGRAMS.length} programas de Primax sin vincular. Cuando quieras, los unimos en una sola cuenta.`}
           </p>
         </button>
       </div>

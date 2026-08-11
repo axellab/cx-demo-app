@@ -100,8 +100,8 @@ export const CHALLENGES: Challenge[] = [
   },
   {
     id: 'racha',
-    title: 'Racha de 10 días',
-    detail: 'Entrá a la app 10 días seguidos, sin faltar ninguno',
+    title: '10 visitas en el mes',
+    detail: 'Sumá 10 visitas antes de que termine el mes, en los días que quieras',
     reward: '+1 sello LiSTO!',
     progress: 0, // se reemplaza con el valor real del store
     goal: 10,

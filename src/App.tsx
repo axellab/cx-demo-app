@@ -60,13 +60,13 @@ export default function App() {
     toastTimer.current = window.setTimeout(() => setToastMsg(null), 2600);
   }, []);
 
-  /* La racha se cuenta al llegar al home, una sola vez por sesión.
+  /* La visita se cuenta al llegar al home, una sola vez por sesión.
      La acción es idempotente por día, así que volver al home no la repite. */
   const checkedIn = useRef(false);
   useEffect(() => {
     if (screen !== 'home' || checkedIn.current) return;
     checkedIn.current = true;
-    actions.checkInStreak();
+    actions.registerVisit();
   }, [screen]);
 
   const nav = useMemo<Nav>(() => ({ screen, go, back, toast }), [screen, go, back, toast]);

@@ -21,16 +21,18 @@ export interface State {
   arClaimed: boolean;
   /** Día (YYYY-MM-DD) en que se cobró el premio del juego. Uno por día. */
   gamePlayedOn: string | null;
-  /** Días seguidos entrando a la app, de 0 a STREAK_GOAL. */
-  streakDays: number;
-  /** Último día contabilizado para la racha. */
-  streakLastDay: string | null;
-  /** Aviso a mostrar cuando la racha avanza. No se persiste. */
-  streakToast: { day: number; earnedStamp: boolean } | null;
+  /** Visitas contadas en el mes en curso, de 0 a VISITS_GOAL. */
+  visits: number;
+  /** Mes (YYYY-MM) al que corresponden esas visitas. Al cambiar de mes, arranca de cero. */
+  visitsMonth: string | null;
+  /** Último día contabilizado: una visita por día como máximo. */
+  lastVisitDay: string | null;
+  /** Aviso a mostrar cuando se suma una visita. No se persiste. */
+  visitToast: { n: number; earnedStamp: boolean } | null;
 }
 
-/** Días seguidos que hay que entrar para ganar el sello. */
-export const STREAK_GOAL = 10;
+/** Visitas que hay que juntar dentro del mes para ganar el sello. */
+export const VISITS_GOAL = 10;
 
 function ymd(d: Date): string {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
@@ -39,6 +41,11 @@ function ymd(d: Date): string {
 /** Fecha local en formato YYYY-MM-DD, para los límites diarios. */
 export function today(): string {
   return ymd(new Date());
+}
+
+/** Mes local en formato YYYY-MM. */
+export function currentMonth(): string {
+  return today().slice(0, 7);
 }
 
 function yesterday(): string {
@@ -57,11 +64,12 @@ const INITIAL: State = {
   history: SEED_HISTORY,
   arClaimed: false,
   gamePlayedOn: null,
-  // Arranca con racha empezada para que en la demo se vea el progreso real,
-  // y no una fila vacía en el día 1.
-  streakDays: 6,
-  streakLastDay: yesterday(),
-  streakToast: null,
+  // Arranca con visitas ya acumuladas para que en la demo se vea el progreso
+  // real, y no una fila vacía.
+  visits: 6,
+  visitsMonth: currentMonth(),
+  lastVisitDay: yesterday(),
+  visitToast: null,
 };
 
 const KEY = 'primax-id-demo/v1';
@@ -92,7 +100,7 @@ function load(): State {
     if (!raw) return INITIAL;
     // Merge sobre INITIAL para que agregar campos nuevos no rompa una demo ya guardada.
     // streakToast es transitorio: nunca se restaura, para que recargar no lo repita.
-    return { ...INITIAL, ...(JSON.parse(raw) as Partial<State>), streakToast: null };
+    return { ...INITIAL, ...(JSON.parse(raw) as Partial<State>), visitToast: null };
   } catch {
     return INITIAL;
   }
@@ -148,6 +156,15 @@ export const actions = {
     set({ onboarded: true, linked: PROGRAMS.map((p) => p.id) });
   },
 
+  /**
+   * "Ahora no": deja entrar a la app sin vincular nada. Vincular tiene que ser
+   * una decisión del cliente, no un peaje para poder usar la app. Desde la
+   * billetera y desde Perfil se puede hacer más tarde.
+   */
+  skipOnboarding() {
+    set({ onboarded: true, linked: [] });
+  },
+
   /** Vuelve a mostrar el onboarding sin perder el resto del estado. */
   replayOnboarding() {
     set({ onboarded: false, linked: [] });
@@ -178,39 +195,47 @@ export const actions = {
   },
 
   /**
-   * Registra la visita del día para la racha. Se llama al llegar al home.
+   * Registra la visita del día. Se llama al llegar al home.
    *
-   * Si entró ayer, la racha sigue; si se saltó un día, vuelve a empezar en 1.
-   * Al llegar a STREAK_GOAL suma un sello LiSTO! y la racha arranca de cero,
-   * para que la mecánica se pueda repetir.
+   * Cuenta hasta una visita por día, dentro del mes en curso: no hace falta que
+   * sean días seguidos, y saltarse un día no penaliza. Al cambiar de mes el
+   * contador arranca de nuevo. Al llegar a VISITS_GOAL suma un sello LiSTO! y
+   * el contador vuelve a cero, para que la mecánica se pueda repetir.
    */
-  checkInStreak() {
+  registerVisit() {
     const t = today();
-    if (state.streakLastDay === t) return; // ya contamos hoy
+    if (state.lastVisitDay === t) return; // ya contamos hoy
 
-    const seguido = state.streakLastDay === yesterday();
-    const dia = seguido ? state.streakDays + 1 : 1;
+    const mes = currentMonth();
+    const mismoMes = state.visitsMonth === mes;
+    const n = (mismoMes ? state.visits : 0) + 1;
 
-    if (dia >= STREAK_GOAL) {
+    if (n >= VISITS_GOAL) {
       set((s) => ({
-        streakDays: 0,
-        streakLastDay: t,
+        visits: 0,
+        visitsMonth: mes,
+        lastVisitDay: t,
         stamps: s.stamps + 1,
-        streakToast: { day: STREAK_GOAL, earnedStamp: true },
+        visitToast: { n: VISITS_GOAL, earnedStamp: true },
       }));
       return;
     }
-    set({ streakDays: dia, streakLastDay: t, streakToast: { day: dia, earnedStamp: false } });
+    set({
+      visits: n,
+      visitsMonth: mes,
+      lastVisitDay: t,
+      visitToast: { n, earnedStamp: false },
+    });
   },
 
-  dismissStreakToast() {
-    set({ streakToast: null });
+  dismissVisitToast() {
+    set({ visitToast: null });
   },
 
-  /** Control de demo: deja la racha a un día de completarse y la avanza. */
-  simulateStreakFinal() {
-    set({ streakDays: STREAK_GOAL - 1, streakLastDay: yesterday() });
-    actions.checkInStreak();
+  /** Control de demo: deja el contador a una visita del final y la suma. */
+  simulateVisitsFinal() {
+    set({ visits: VISITS_GOAL - 1, visitsMonth: currentMonth(), lastVisitDay: yesterday() });
+    actions.registerVisit();
   },
 
   /** Premio del juego diario. Solo suma si todavía no jugó hoy. */

@@ -11,12 +11,40 @@ import { Icon } from './Icon';
  * desglose de dónde sale.
  */
 export function WalletCard() {
-  const { points, stamps, savedYtd } = useStore();
-  const { go } = useNav();
+  const { points, stamps, savedYtd, linked } = useStore();
+  const { go, toast } = useNav();
 
   const cupon = stamps >= RULES.sellosParaCupon ? RULES.valorCupon : 0;
   const available = points * RULES.solesPorPunto + cupon;
   const sources = [points > 0, cupon > 0, true].filter(Boolean).length;
+
+  /* Si eligió "ahora no" en el onboarding, no podemos mostrarle saldos de
+     programas que todavía no vinculó: mostramos la invitación, no el número. */
+  if (linked.length === 0) {
+    return (
+      <div className="wcard">
+        <span className="label">Tu billetera</span>
+        <div className="wcard-locked">
+          <Icon name="link" size={30} strokeWidth={1.7} />
+          <h3>Todavía no vinculaste tus programas</h3>
+          <p>
+            Bonus, Sellos LiSTO!, tu convenio, Primax Gas y lubricantes. Al vincularlos, vas a ver
+            todo lo que tenés acumulado en un solo número.
+          </p>
+        </div>
+        <div className="wcard-actions">
+          <button className="hot" onClick={() => go('onboarding')}>
+            <Icon name="link" size={17} strokeWidth={2} />
+            Vincular ahora
+          </button>
+          <button onClick={() => toast('Podés vincularlos cuando quieras, desde acá o desde Perfil')}>
+            <Icon name="info" size={17} strokeWidth={2} />
+            Más tarde
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="wcard">
